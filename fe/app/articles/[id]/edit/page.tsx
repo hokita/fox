@@ -13,10 +13,12 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params)
   // Mock data - in real app, fetch based on params.id
   const [date, setDate] = useState('2025-01-15')
-  const [articleTitle, setArticleTitle] = useState('The Future of Artificial Intelligence in Education')
+  const [articleTitle, setArticleTitle] = useState(
+    'The Future of Artificial Intelligence in Education',
+  )
   const [articleUrl, setArticleUrl] = useState('https://example.com/ai-education')
   const [articleBody, setArticleBody] = useState(
-    'Artificial intelligence is transforming the educational landscape in unprecedented ways. From personalized learning experiences to automated grading systems, AI is making education more accessible and effective for students worldwide.\n\nThe integration of AI tools in classrooms enables teachers to focus more on individual student needs while AI handles routine administrative tasks. This shift allows for more meaningful interactions between educators and learners.'
+    'Artificial intelligence is transforming the educational landscape in unprecedented ways. From personalized learning experiences to automated grading systems, AI is making education more accessible and effective for students worldwide.\n\nThe integration of AI tools in classrooms enables teachers to focus more on individual student needs while AI handles routine administrative tasks. This shift allows for more meaningful interactions between educators and learners.',
   )
   const [questions, setQuestions] = useState([
     {
@@ -27,7 +29,8 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
     {
       id: 2,
       question: 'How does AI help teachers according to the text?',
-      answer: 'AI handles routine administrative tasks, allowing teachers to focus more on individual student needs',
+      answer:
+        'AI handles routine administrative tasks, allowing teachers to focus more on individual student needs',
     },
     {
       id: 3,
@@ -47,11 +50,11 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
   ])
 
   const handleQuestionChange = (id: number, value: string) => {
-    setQuestions(questions.map((q) => (q.id === id ? { ...q, question: value } : q)))
+    setQuestions(questions.map(q => (q.id === id ? { ...q, question: value } : q)))
   }
 
   const handleAnswerChange = (id: number, value: string) => {
-    setQuestions(questions.map((q) => (q.id === id ? { ...q, answer: value } : q)))
+    setQuestions(questions.map(q => (q.id === id ? { ...q, answer: value } : q)))
   }
 
   const handleSave = () => {
@@ -71,13 +74,19 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header with back button */}
         <div className="mb-8">
-          <Button asChild variant="ghost" className="mb-4 gap-2 text-muted-foreground hover:text-foreground">
+          <Button
+            asChild
+            variant="ghost"
+            className="mb-4 gap-2 text-muted-foreground hover:text-foreground"
+          >
             <Link href={`/articles/${id}`}>
               <ArrowLeft className="h-4 w-4" />
               Back to Article
             </Link>
           </Button>
-          <h1 className="font-serif text-4xl font-light tracking-tight text-foreground">Edit Article</h1>
+          <h1 className="font-serif text-4xl font-light tracking-tight text-foreground">
+            Edit Article
+          </h1>
           <p className="mt-2 text-lg text-muted-foreground">Update your article and answers</p>
         </div>
 
@@ -86,7 +95,10 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
           <Card className="border-border/50 bg-card p-6">
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="date" className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Label
+                  htmlFor="date"
+                  className="flex items-center gap-2 text-sm font-medium text-foreground"
+                >
                   <Calendar className="h-4 w-4 text-accent-foreground" />
                   Date
                 </Label>
@@ -94,12 +106,15 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
                   id="date"
                   type="date"
                   value={date}
-                  onChange={(e) => setDate(e.target.value)}
+                  onChange={e => setDate(e.target.value)}
                   className="w-full border-border/50 bg-background"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="url" className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Label
+                  htmlFor="url"
+                  className="flex items-center gap-2 text-sm font-medium text-foreground"
+                >
                   <Link2 className="h-4 w-4 text-accent-foreground" />
                   Article URL
                 </Label>
@@ -108,7 +123,7 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
                   type="url"
                   placeholder="https://example.com/article"
                   value={articleUrl}
-                  onChange={(e) => setArticleUrl(e.target.value)}
+                  onChange={e => setArticleUrl(e.target.value)}
                   className="w-full border-border/50 bg-background"
                 />
               </div>
@@ -118,7 +133,10 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
           {/* Article Title Section */}
           <Card className="border-border/50 bg-card p-6">
             <div className="space-y-3">
-              <Label htmlFor="title" className="flex items-center gap-2 text-base font-semibold text-foreground">
+              <Label
+                htmlFor="title"
+                className="flex items-center gap-2 text-base font-semibold text-foreground"
+              >
                 <BookOpen className="h-5 w-5 text-accent-foreground" />
                 Article Title
               </Label>
@@ -127,7 +145,7 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
                 type="text"
                 placeholder="Enter the article title..."
                 value={articleTitle}
-                onChange={(e) => setArticleTitle(e.target.value)}
+                onChange={e => setArticleTitle(e.target.value)}
                 className="text-base border-border/50 bg-background"
               />
             </div>
@@ -136,7 +154,10 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
           {/* Article Body Section */}
           <Card className="border-border/50 bg-card p-6">
             <div className="space-y-3">
-              <Label htmlFor="article" className="flex items-center gap-2 text-base font-semibold text-foreground">
+              <Label
+                htmlFor="article"
+                className="flex items-center gap-2 text-base font-semibold text-foreground"
+              >
                 <BookOpen className="h-5 w-5 text-accent-foreground" />
                 Article Body
               </Label>
@@ -144,7 +165,7 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
                 id="article"
                 placeholder="Paste or type the article content here..."
                 value={articleBody}
-                onChange={(e) => setArticleBody(e.target.value)}
+                onChange={e => setArticleBody(e.target.value)}
                 className="min-h-[300px] resize-y text-base leading-relaxed border-border/50 bg-background"
               />
             </div>
@@ -160,28 +181,37 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
 
               <div className="space-y-6">
                 {questions.map((q, index) => (
-                  <div key={q.id} className="space-y-4 rounded-lg border border-border/50 p-4 bg-accent/20">
+                  <div
+                    key={q.id}
+                    className="space-y-4 rounded-lg border border-border/50 p-4 bg-accent/20"
+                  >
                     <div className="space-y-2">
-                      <Label htmlFor={`question-${q.id}`} className="text-sm font-medium text-foreground">
+                      <Label
+                        htmlFor={`question-${q.id}`}
+                        className="text-sm font-medium text-foreground"
+                      >
                         Question {index + 1}
                       </Label>
                       <Input
                         id={`question-${q.id}`}
                         placeholder="Enter your question..."
                         value={q.question}
-                        onChange={(e) => handleQuestionChange(q.id, e.target.value)}
+                        onChange={e => handleQuestionChange(q.id, e.target.value)}
                         className="border-border/50 bg-background"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`answer-${q.id}`} className="text-sm font-medium text-muted-foreground">
+                      <Label
+                        htmlFor={`answer-${q.id}`}
+                        className="text-sm font-medium text-muted-foreground"
+                      >
                         Your Answer
                       </Label>
                       <Textarea
                         id={`answer-${q.id}`}
                         placeholder="Type your answer here..."
                         value={q.answer}
-                        onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                        onChange={e => handleAnswerChange(q.id, e.target.value)}
                         className="min-h-[100px] resize-y border-border/50 bg-background"
                       />
                     </div>

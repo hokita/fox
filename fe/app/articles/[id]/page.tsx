@@ -24,7 +24,8 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
       {
         id: 2,
         question: 'How does AI help teachers according to the text?',
-        answer: 'AI handles routine administrative tasks, allowing teachers to focus more on individual student needs',
+        answer:
+          'AI handles routine administrative tasks, allowing teachers to focus more on individual student needs',
       },
       {
         id: 3,
@@ -50,7 +51,11 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
         {/* Header with back button and edit button */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <Button asChild variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
+            <Button
+              asChild
+              variant="ghost"
+              className="gap-2 text-muted-foreground hover:text-foreground"
+            >
               <Link href="/">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Articles
@@ -63,7 +68,9 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
               </Link>
             </Button>
           </div>
-          <h1 className="font-serif text-4xl font-light tracking-tight text-foreground">Article Preview</h1>
+          <h1 className="font-serif text-4xl font-light tracking-tight text-foreground">
+            Article Preview
+          </h1>
           <p className="mt-2 text-lg text-muted-foreground">Review your article and answers</p>
         </div>
 
@@ -113,7 +120,9 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
                 <BookOpen className="h-5 w-5 text-accent-foreground" />
                 Article Body
               </Label>
-              <div className="text-base leading-relaxed text-foreground whitespace-pre-wrap">{article.body}</div>
+              <div className="text-base leading-relaxed text-foreground whitespace-pre-wrap">
+                {article.body}
+              </div>
             </div>
           </Card>
 
@@ -127,13 +136,20 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
 
               <div className="space-y-6">
                 {article.questions.map((q, index) => (
-                  <div key={q.id} className="space-y-4 rounded-lg border border-border/50 p-4 bg-accent/20">
+                  <div
+                    key={q.id}
+                    className="space-y-4 rounded-lg border border-border/50 p-4 bg-accent/20"
+                  >
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium text-foreground">Question {index + 1}</Label>
+                      <Label className="text-sm font-medium text-foreground">
+                        Question {index + 1}
+                      </Label>
                       <p className="text-base text-foreground">{q.question}</p>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium text-muted-foreground">Your Answer</Label>
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        Your Answer
+                      </Label>
                       <p className="text-base text-foreground">{q.answer}</p>
                     </div>
                   </div>

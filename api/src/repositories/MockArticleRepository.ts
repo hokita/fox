@@ -46,7 +46,7 @@ export class MockArticleRepository implements ArticleRepository {
   }
 
   async findById(id: string): Promise<Article | null> {
-    const article = this.articles.find((a) => a.id === id)
+    const article = this.articles.find(a => a.id === id)
     return article || null
   }
 }

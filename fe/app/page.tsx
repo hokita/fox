@@ -43,7 +43,9 @@ export default function ArticleListPage() {
             <h1 className="font-serif text-5xl font-light tracking-tight text-foreground lg:text-6xl">
               English Learning
             </h1>
-            <p className="mt-3 text-lg text-muted-foreground">Read articles and practice comprehension</p>
+            <p className="mt-3 text-lg text-muted-foreground">
+              Read articles and practice comprehension
+            </p>
           </div>
           <Button asChild size="lg" className="gap-2">
             <Link href="/articles/new">
@@ -55,7 +57,7 @@ export default function ArticleListPage() {
 
         {/* Article List */}
         <div className="space-y-1">
-          {articles.map((article) => (
+          {articles.map(article => (
             <Link
               key={article.id}
               href={`/articles/${article.id}`}
@@ -64,7 +66,9 @@ export default function ArticleListPage() {
               <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12">
                 {/* Date */}
                 <div className="lg:col-span-2">
-                  <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">{article.date}</p>
+                  <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">
+                    {article.date}
+                  </p>
                 </div>
 
                 {/* Title */}
