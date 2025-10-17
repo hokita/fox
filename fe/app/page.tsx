@@ -1,39 +1,34 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-
-interface Article {
-  id: string
-  date: string
-  title: string
-}
+import { getArticles } from '@/api/articles'
+import { formatDisplayDate } from '@/lib/date'
+import { type Article } from '@/models/article'
 
 export default function ArticleListPage() {
-  const [articles] = useState<Article[]>([
-    {
-      id: '1',
-      date: 'JAN 15 2025',
-      title: 'The Future of Artificial Intelligence in Education',
-    },
-    {
-      id: '2',
-      date: 'JAN 08 2025',
-      title: 'Understanding Climate Change Through Data Visualization',
-    },
-    {
-      id: '3',
-      date: 'DEC 22 2024',
-      title: 'How Technology is Transforming Modern Healthcare',
-    },
-    {
-      id: '4',
-      date: 'DEC 15 2024',
-      title: 'The Rise of Sustainable Energy Solutions',
-    },
-  ])
+  const [articles, setArticles] = useState<Article[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const data = await getArticles()
+        setArticles(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load articles')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchArticles()
+  }, [])
 
   return (
     <div className="min-h-screen bg-background">
@@ -55,39 +50,68 @@ export default function ArticleListPage() {
           </Button>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-16">
+            <p className="text-lg text-muted-foreground">Loading articles...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6">
+            <p className="text-destructive">Error: {error}</p>
+            <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
+              Retry
+            </Button>
+          </div>
+        )}
+
         {/* Article List */}
-        <div className="space-y-1">
-          {articles.map(article => (
-            <Link
-              key={article.id}
-              href={`/articles/${article.id}`}
-              className="group block border-t border-border py-8 transition-colors hover:bg-accent/30"
-            >
-              <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12">
-                {/* Date */}
-                <div className="lg:col-span-2">
-                  <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">
-                    {article.date}
-                  </p>
-                </div>
-
-                {/* Title */}
-                <div className="lg:col-span-9">
-                  <h2 className="font-serif text-2xl font-light tracking-tight text-foreground transition-colors group-hover:text-primary lg:text-3xl">
-                    {article.title}
-                  </h2>
-                </div>
-
-                {/* Arrow */}
-                <div className="flex justify-end lg:col-span-1">
-                  <ArrowRight className="h-6 w-6 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
-                </div>
+        {!loading && !error && (
+          <div className="space-y-1">
+            {articles.length === 0 ? (
+              <div className="py-16 text-center">
+                <p className="text-lg text-muted-foreground">
+                  No articles yet. Create your first article!
+                </p>
               </div>
-            </Link>
-          ))}
-          {/* Bottom border */}
-          <div className="border-t border-border" />
-        </div>
+            ) : (
+              <>
+                {articles.map(article => (
+                  <Link
+                    key={article.id}
+                    href={`/articles/${article.id}`}
+                    className="group block border-t border-border py-8 transition-colors hover:bg-accent/30"
+                  >
+                    <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12">
+                      {/* Date */}
+                      <div className="lg:col-span-2">
+                        <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">
+                          {formatDisplayDate(article.date)}
+                        </p>
+                      </div>
+
+                      {/* Title */}
+                      <div className="lg:col-span-9">
+                        <h2 className="font-serif text-2xl font-light tracking-tight text-foreground transition-colors group-hover:text-primary lg:text-3xl">
+                          {article.title}
+                        </h2>
+                      </div>
+
+                      {/* Arrow */}
+                      <div className="flex justify-end lg:col-span-1">
+                        <ArrowRight className="h-6 w-6 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+                {/* Bottom border */}
+                <div className="border-t border-border" />
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
