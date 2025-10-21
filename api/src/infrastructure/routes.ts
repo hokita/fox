@@ -3,13 +3,13 @@ import { HelloWorldController } from '../controllers/HelloWorldController'
 import { ArticlesController } from '../controllers/ArticlesController'
 import { GetArticlesUseCase } from '../usecases/GetArticlesUseCase'
 import { GetArticleUseCase } from '../usecases/GetArticleUseCase'
-import { MockArticleRepository } from '../repositories/MockArticleRepository'
+import { MySQLArticleRepository } from '../repositories/MySQLArticleRepository'
 
 const router = Router()
 const helloWorldController = new HelloWorldController()
 
 // Articles
-const articleRepository = new MockArticleRepository()
+const articleRepository = new MySQLArticleRepository()
 const getArticlesUseCase = new GetArticlesUseCase(articleRepository)
 const getArticleUseCase = new GetArticleUseCase(articleRepository)
 const articlesController = new ArticlesController(getArticlesUseCase, getArticleUseCase)
