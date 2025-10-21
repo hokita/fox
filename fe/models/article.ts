@@ -1,12 +1,14 @@
 export interface Article {
   id: string
-  date: string
   title: string
+  url: string
+  body: string
+  studied_at: string
+  created_at: string
+  updated_at: string
 }
 
 export interface ArticleDetail extends Article {
-  url: string
-  body: string
   questions: Question[]
 }
 

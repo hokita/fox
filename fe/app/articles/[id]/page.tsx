@@ -101,7 +101,7 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
                   <Calendar className="h-4 w-4 text-accent-foreground" />
                   Date
                 </Label>
-                <p className="text-base text-foreground">{formatDisplayDate(article.date)}</p>
+                <p className="text-base text-foreground">{formatDisplayDate(article.studied_at)}</p>
               </div>
               <div className="space-y-2">
                 <Label className="flex items-center gap-2 text-sm font-medium text-foreground">

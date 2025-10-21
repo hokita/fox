@@ -35,13 +35,8 @@ export async function getArticleById(id: string): Promise<ArticleDetail> {
 
   const data: ArticleResponse = await response.json()
 
-  // Map backend Article to frontend ArticleDetail
   return {
-    id: data.article.id,
-    date: data.article.studied_at,
-    title: data.article.title,
-    url: data.article.url,
-    body: data.article.body,
+    ...data.article,
     questions: [], // Questions not implemented yet
   }
 }

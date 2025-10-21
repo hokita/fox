@@ -88,7 +88,7 @@ export default function ArticleListPage() {
                       {/* Date */}
                       <div className="lg:col-span-2">
                         <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">
-                          {formatDisplayDate(article.date)}
+                          {formatDisplayDate(article.studied_at)}
                         </p>
                       </div>
 
