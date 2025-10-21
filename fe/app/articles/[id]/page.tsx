@@ -1,49 +1,67 @@
 'use client'
 
-import { use, useState } from 'react'
+import { use, useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Calendar, Link2, BookOpen, HelpCircle, Edit, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { getArticleById } from '@/api/articles'
+import { ArticleDetail } from '@/models/article'
+import { formatDisplayDate } from '@/lib/date'
 
 export default function ArticlePreviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  // Mock data - in real app, fetch based on params.id
-  const [article] = useState({
-    date: '2025-01-15',
-    title: 'The Future of Artificial Intelligence in Education',
-    url: 'https://example.com/ai-education',
-    body: 'Artificial intelligence is transforming the educational landscape in unprecedented ways. From personalized learning experiences to automated grading systems, AI is making education more accessible and effective for students worldwide.\n\nThe integration of AI tools in classrooms enables teachers to focus more on individual student needs while AI handles routine administrative tasks. This shift allows for more meaningful interactions between educators and learners.',
-    questions: [
-      {
-        id: 1,
-        question: 'What are the main benefits of AI in education mentioned in the article?',
-        answer: 'Personalized learning experiences and automated grading systems',
-      },
-      {
-        id: 2,
-        question: 'How does AI help teachers according to the text?',
-        answer:
-          'AI handles routine administrative tasks, allowing teachers to focus more on individual student needs',
-      },
-      {
-        id: 3,
-        question: 'What is the overall impact of AI on education accessibility?',
-        answer: 'AI makes education more accessible and effective for students worldwide',
-      },
-      {
-        id: 4,
-        question: 'What type of interactions does AI enable in the classroom?',
-        answer: 'More meaningful interactions between educators and learners',
-      },
-      {
-        id: 5,
-        question: 'How is AI transforming the educational landscape?',
-        answer: 'In unprecedented ways through various technological integrations',
-      },
-    ],
-  })
+  const [article, setArticle] = useState<ArticleDetail | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchArticle = async () => {
+      try {
+        setLoading(true)
+        const data = await getArticleById(id)
+        setArticle(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch article')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchArticle()
+  }, [id])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <p className="text-lg text-muted-foreground">Loading article...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+            <p className="text-lg text-destructive">{error}</p>
+            <Button asChild variant="outline">
+              <Link href="/">Back to Articles</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!article) {
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,7 +101,7 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
                   <Calendar className="h-4 w-4 text-accent-foreground" />
                   Date
                 </Label>
-                <p className="text-base text-foreground">{article.date}</p>
+                <p className="text-base text-foreground">{formatDisplayDate(article.date)}</p>
               </div>
               <div className="space-y-2">
                 <Label className="flex items-center gap-2 text-sm font-medium text-foreground">
@@ -127,36 +145,38 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
           </Card>
 
           {/* Questions Section */}
-          <Card className="border-border/50 bg-card p-6">
-            <div className="space-y-6">
-              <Label className="flex items-center gap-2 text-base font-semibold text-foreground">
-                <HelpCircle className="h-5 w-5 text-accent-foreground" />
-                Comprehension Questions
-              </Label>
-
+          {article.questions.length > 0 && (
+            <Card className="border-border/50 bg-card p-6">
               <div className="space-y-6">
-                {article.questions.map((q, index) => (
-                  <div
-                    key={q.id}
-                    className="space-y-4 rounded-lg border border-border/50 p-4 bg-accent/20"
-                  >
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-foreground">
-                        Question {index + 1}
-                      </Label>
-                      <p className="text-base text-foreground">{q.question}</p>
+                <Label className="flex items-center gap-2 text-base font-semibold text-foreground">
+                  <HelpCircle className="h-5 w-5 text-accent-foreground" />
+                  Comprehension Questions
+                </Label>
+
+                <div className="space-y-6">
+                  {article.questions.map((q, index) => (
+                    <div
+                      key={q.id}
+                      className="space-y-4 rounded-lg border border-border/50 p-4 bg-accent/20"
+                    >
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-foreground">
+                          Question {index + 1}
+                        </Label>
+                        <p className="text-base text-foreground">{q.question}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-muted-foreground">
+                          Your Answer
+                        </Label>
+                        <p className="text-base text-foreground">{q.answer}</p>
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-muted-foreground">
-                        Your Answer
-                      </Label>
-                      <p className="text-base text-foreground">{q.answer}</p>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
-import { Article } from '@/models/article'
-import { ArticlesResponse } from '@/models/response'
+import { Article, ArticleDetail } from '@/models/article'
+import { ArticlesResponse, ArticleResponse } from '@/models/response'
 
 // API Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
@@ -19,4 +19,29 @@ export async function getArticles(): Promise<Article[]> {
 
   const data: ArticlesResponse = await response.json()
   return data.articles
+}
+
+export async function getArticleById(id: string): Promise<ArticleDetail> {
+  const response = await fetch(`${API_BASE_URL}/api/articles/${id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch article: ${response.status}`)
+  }
+
+  const data: ArticleResponse = await response.json()
+
+  // Map backend Article to frontend ArticleDetail
+  return {
+    id: data.article.id,
+    date: data.article.studied_at,
+    title: data.article.title,
+    url: data.article.url,
+    body: data.article.body,
+    questions: [], // Questions not implemented yet
+  }
 }
