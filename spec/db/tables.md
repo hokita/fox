@@ -4,18 +4,18 @@
 
 The `articles` table stores English learning articles and their metadata.
 
-| Column Name | Type          | Attributes / Default                                            | Description                               |
-| ----------- | ------------- | --------------------------------------------------------------- | ----------------------------------------- |
-| id          | CHAR(64)      | PRIMARY KEY, NOT NULL                                           | Unique identifier (hash) for each article |
-| url         | VARCHAR(2048) | NOT NULL                                                        | Article URL (up to 2048 characters)       |
-| body        | TEXT          | NOT NULL                                                        | Article content or full text              |
-| studied_at  | DATETIME      | NOT NULL                                                        | The time you study the article            |
-| created_at  | DATETIME      | NOT NULL, DEFAULT CURRENT_TIMESTAMP                             | When the record was created               |
-| updated_at  | DATETIME      | NOT NULL, DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | When the record was last updated          |
+| Column Name | Type          | Attributes / Default                                            | Description                             |
+| ----------- | ------------- | --------------------------------------------------------------- | --------------------------------------- |
+| id          | CHAR(36)      | PRIMARY KEY, NOT NULL                                           | Unique identifier (UUID) for each article |
+| url         | VARCHAR(2048) | NOT NULL                                                        | Article URL (up to 2048 characters)     |
+| body        | TEXT          | NOT NULL                                                        | Article content or full text            |
+| studied_at  | DATETIME      | NOT NULL                                                        | The time you study the article          |
+| created_at  | DATETIME      | NOT NULL, DEFAULT CURRENT_TIMESTAMP                             | When the record was created             |
+| updated_at  | DATETIME      | NOT NULL, DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | When the record was last updated        |
 
 ### Notes
 
-- `id`: Uses CHAR(64) to store hash-based unique identifiers
+- `id`: Uses CHAR(36) to store UUID-based unique identifiers
 - `url`: Maximum length of 2048 characters to accommodate long URLs
 - `body`: TEXT type for storing variable-length article content
 - `studied_at`: Records when the user studied or plans to study the article
@@ -26,15 +26,15 @@ The `articles` table stores English learning articles and their metadata.
 
 The `questions` table stores comprehension questions related to articles.
 
-| Column Name | Type     | Attributes / Default                                            | Description                                |
-| ----------- | -------- | --------------------------------------------------------------- | ------------------------------------------ |
-| id          | CHAR(64) | PRIMARY KEY, NOT NULL                                           | Unique identifier (hash) for each question |
-| article_id  | CHAR(64) | NOT NULL                                                        | ID of the related article                  |
-| sort        | INT      | NOT NULL                                                        | Order of the question within the article   |
-| body        | TEXT     | NOT NULL                                                        | Question text content                      |
-| answer      | TEXT     | NOT NULL                                                        | Answer text content                        |
-| created_at  | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP                             | When the question was created              |
-| updated_at  | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | When the question was last updated         |
+| Column Name | Type     | Attributes / Default                                            | Description                              |
+| ----------- | -------- | --------------------------------------------------------------- | ---------------------------------------- |
+| id          | CHAR(36) | PRIMARY KEY, NOT NULL                                           | Unique identifier (UUID) for each question |
+| article_id  | CHAR(36) | NOT NULL                                                        | ID of the related article                |
+| sort        | INT      | NOT NULL                                                        | Order of the question within the article |
+| body        | TEXT     | NOT NULL                                                        | Question text content                    |
+| answer      | TEXT     | NOT NULL                                                        | Answer text content                      |
+| created_at  | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP                             | When the question was created            |
+| updated_at  | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | When the question was last updated       |
 
 ### Notes
 
