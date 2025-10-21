@@ -1,4 +1,8 @@
-# Articles
+# Database Table Specifications
+
+## Articles
+
+The `articles` table stores English learning articles and their metadata.
 
 | Column Name | Type          | Attributes / Default                                            | Description                               |
 | ----------- | ------------- | --------------------------------------------------------------- | ----------------------------------------- |
@@ -9,18 +13,18 @@
 | created_at  | DATETIME      | NOT NULL, DEFAULT CURRENT_TIMESTAMP                             | When the record was created               |
 | updated_at  | DATETIME      | NOT NULL, DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | When the record was last updated          |
 
-```sql
-CREATE TABLE articles (
-  id CHAR(64) NOT NULL PRIMARY KEY,
-  url VARCHAR(2048) NOT NULL,
-  body TEXT NOT NULL,
-  studied_at DATETIME NOT NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+### Notes
 
-# Questions
+- `id`: Uses CHAR(64) to store hash-based unique identifiers
+- `url`: Maximum length of 2048 characters to accommodate long URLs
+- `body`: TEXT type for storing variable-length article content
+- `studied_at`: Records when the user studied or plans to study the article
+
+---
+
+## Questions
+
+The `questions` table stores comprehension questions related to articles.
 
 | Column Name | Type     | Attributes / Default                                            | Description                                |
 | ----------- | -------- | --------------------------------------------------------------- | ------------------------------------------ |
@@ -32,14 +36,14 @@ CREATE TABLE articles (
 | created_at  | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP                             | When the question was created              |
 | updated_at  | DATETIME | NOT NULL, DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | When the question was last updated         |
 
-```sql
-CREATE TABLE questions (
-  id CHAR(64) NOT NULL PRIMARY KEY,
-  article_id CHAR(64) NOT NULL,
-  sort INT NOT NULL,
-  body TEXT NOT NULL,
-  answer TEXT NOT NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+### Notes
+
+- `article_id`: Foreign key reference to the `articles` table
+- `sort`: Determines the display order of questions for an article
+- `body`: Stores the question text
+- `answer`: Stores the user's answer to the question
+
+### Relationships
+
+- Each question belongs to one article (many-to-one relationship via `article_id`)
+- Questions are ordered within an article using the `sort` field
