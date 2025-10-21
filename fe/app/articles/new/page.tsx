@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -8,10 +9,11 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Calendar, Link2, BookOpen, HelpCircle, Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { createArticle } from '@/api/articles'
 
 export default function EnglishLearningPage() {
+  const router = useRouter()
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
-  const [articleTitle, setArticleTitle] = useState('')
   const [articleUrl, setArticleUrl] = useState('')
   const [articleBody, setArticleBody] = useState('')
   const [questions, setQuestions] = useState([
@@ -21,6 +23,8 @@ export default function EnglishLearningPage() {
     { id: 4, question: '', answer: '' },
     { id: 5, question: '', answer: '' },
   ])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleQuestionChange = (id: number, value: string) => {
     setQuestions(questions.map(q => (q.id === id ? { ...q, question: value } : q)))
@@ -30,16 +34,28 @@ export default function EnglishLearningPage() {
     setQuestions(questions.map(q => (q.id === id ? { ...q, answer: value } : q)))
   }
 
-  const handleSave = () => {
-    const data = {
-      date,
-      articleTitle,
-      articleUrl,
-      articleBody,
-      questions,
+  const handleSave = async () => {
+    setError(null)
+    setLoading(true)
+
+    try {
+      const result = await createArticle({
+        url: articleUrl,
+        body: articleBody,
+        studied_at: date,
+        questions: questions.map(q => ({
+          question: q.question,
+          answer: q.answer,
+        })),
+      })
+
+      alert('Article created successfully!')
+      router.push(`/articles/${result.id}`)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create article')
+    } finally {
+      setLoading(false)
     }
-    console.log('Saving data:', data)
-    alert('Article and answers saved successfully!')
   }
 
   return (
@@ -105,26 +121,12 @@ export default function EnglishLearningPage() {
             </div>
           </Card>
 
-          {/* Article Title Section */}
-          <Card className="border-border/50 bg-card p-6">
-            <div className="space-y-3">
-              <Label
-                htmlFor="title"
-                className="flex items-center gap-2 text-base font-semibold text-foreground"
-              >
-                <BookOpen className="h-5 w-5 text-accent-foreground" />
-                Article Title
-              </Label>
-              <Input
-                id="title"
-                type="text"
-                placeholder="Enter the article title..."
-                value={articleTitle}
-                onChange={e => setArticleTitle(e.target.value)}
-                className="text-base border-border/50 bg-background"
-              />
-            </div>
-          </Card>
+          {/* Error Message */}
+          {error && (
+            <Card className="border-destructive bg-destructive/10 p-4">
+              <p className="text-sm text-destructive">{error}</p>
+            </Card>
+          )}
 
           {/* Article Body Section */}
           <Card className="border-border/50 bg-card p-6">
@@ -201,10 +203,11 @@ export default function EnglishLearningPage() {
             <Button
               onClick={handleSave}
               size="lg"
-              className="gap-2 px-8 bg-primary text-primary-foreground hover:bg-primary/90"
+              disabled={loading}
+              className="gap-2 px-8 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
               <Save className="h-5 w-5" />
-              Save Progress
+              {loading ? 'Saving...' : 'Save Progress'}
             </Button>
           </div>
         </div>

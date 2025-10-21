@@ -40,3 +40,34 @@ export async function getArticleById(id: string): Promise<ArticleDetail> {
     questions: [], // Questions not implemented yet
   }
 }
+
+export interface CreateArticleInput {
+  url: string
+  body: string
+  studied_at: string
+  questions: Array<{
+    question: string
+    answer: string
+  }>
+}
+
+export interface CreateArticleResponse {
+  id: string
+  message: string
+}
+
+export async function createArticle(input: CreateArticleInput): Promise<CreateArticleResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/articles`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to create article: ${response.status}`)
+  }
+
+  return await response.json()
+}

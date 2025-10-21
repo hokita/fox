@@ -1,5 +1,5 @@
 import { Article } from '../entities/Article'
-import { ArticleRepository } from './ArticleRepository'
+import { ArticleRepository, Question } from './ArticleRepository'
 
 export class MockArticleRepository implements ArticleRepository {
   private articles: Article[] = [
@@ -48,5 +48,10 @@ export class MockArticleRepository implements ArticleRepository {
   async findById(id: string): Promise<Article | null> {
     const article = this.articles.find(a => a.id === id)
     return article || null
+  }
+
+  async create(article: Article, questions: Question[]): Promise<void> {
+    this.articles.push(article)
+    // Mock implementation - questions are not stored in memory
   }
 }
