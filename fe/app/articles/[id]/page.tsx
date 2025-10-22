@@ -163,7 +163,7 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
                         <Label className="text-sm font-medium text-foreground">
                           Question {index + 1}
                         </Label>
-                        <p className="text-base text-foreground">{q.question}</p>
+                        <p className="text-base text-foreground">{q.body}</p>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-sm font-medium text-muted-foreground">

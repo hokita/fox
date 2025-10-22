@@ -13,7 +13,11 @@ export interface ArticleDetail extends Article {
 }
 
 export interface Question {
-  id: number
-  question: string
+  id: string
+  article_id: string
+  sort: number
+  body: string
   answer: string
+  created_at: string
+  updated_at: string
 }

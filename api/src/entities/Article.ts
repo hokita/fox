@@ -7,3 +7,17 @@ export interface Article {
   created_at: Date
   updated_at: Date
 }
+
+export interface QuestionEntity {
+  id: string
+  article_id: string
+  sort: number
+  body: string
+  answer: string
+  created_at: Date
+  updated_at: Date
+}
+
+export interface ArticleDetail extends Article {
+  questions: QuestionEntity[]
+}

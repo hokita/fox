@@ -1,4 +1,4 @@
-import { Article } from '../entities/Article'
+import { Article, ArticleDetail } from '../entities/Article'
 import { ArticleRepository, Question } from './ArticleRepository'
 
 export class MockArticleRepository implements ArticleRepository {
@@ -48,6 +48,18 @@ export class MockArticleRepository implements ArticleRepository {
   async findById(id: string): Promise<Article | null> {
     const article = this.articles.find(a => a.id === id)
     return article || null
+  }
+
+  async findByIdWithQuestions(id: string): Promise<ArticleDetail | null> {
+    const article = this.articles.find(a => a.id === id)
+    if (!article) {
+      return null
+    }
+
+    return {
+      ...article,
+      questions: [],
+    }
   }
 
   async create(article: Article, questions: Question[]): Promise<void> {

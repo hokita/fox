@@ -35,10 +35,7 @@ export async function getArticleById(id: string): Promise<ArticleDetail> {
 
   const data: ArticleResponse = await response.json()
 
-  return {
-    ...data.article,
-    questions: [], // Questions not implemented yet
-  }
+  return data.article
 }
 
 export interface CreateArticleInput {

@@ -1,4 +1,4 @@
-import { Article } from '../entities/Article'
+import { Article, ArticleDetail, QuestionEntity } from '../entities/Article'
 import { ArticleRepository, Question } from './ArticleRepository'
 import pool from '../infrastructure/database'
 import { RowDataPacket } from 'mysql2'
@@ -9,6 +9,16 @@ interface ArticleRow extends RowDataPacket {
   url: string
   body: string
   studied_at: string
+  created_at: string
+  updated_at: string
+}
+
+interface QuestionRow extends RowDataPacket {
+  id: string
+  article_id: string
+  sort: number
+  body: string
+  answer: string
   created_at: string
   updated_at: string
 }
@@ -44,6 +54,34 @@ export class MySQLArticleRepository implements ArticleRepository {
       studied_at: new Date(row.studied_at),
       created_at: new Date(row.created_at),
       updated_at: new Date(row.updated_at),
+    }
+  }
+
+  async findByIdWithQuestions(id: string): Promise<ArticleDetail | null> {
+    const article = await this.findById(id)
+
+    if (!article) {
+      return null
+    }
+
+    const [questionRows] = await pool.query<QuestionRow[]>(
+      'SELECT * FROM questions WHERE article_id = ? ORDER BY sort ASC',
+      [id],
+    )
+
+    const questions: QuestionEntity[] = questionRows.map(row => ({
+      id: row.id,
+      article_id: row.article_id,
+      sort: row.sort,
+      body: row.body,
+      answer: row.answer,
+      created_at: new Date(row.created_at),
+      updated_at: new Date(row.updated_at),
+    }))
+
+    return {
+      ...article,
+      questions,
     }
   }
 
