@@ -131,6 +131,40 @@ export class MySQLArticleRepository implements ArticleRepository {
     }
   }
 
+  async update(id: string, article: Article, questions: Question[]): Promise<void> {
+    const connection = await pool.getConnection()
+
+    try {
+      await connection.beginTransaction()
+
+      // Update article
+      await connection.query(
+        'UPDATE articles SET url = ?, body = ?, studied_at = ?, updated_at = ? WHERE id = ?',
+        [article.url, article.body, article.studied_at, new Date(), id],
+      )
+
+      // Delete existing questions
+      await connection.query('DELETE FROM questions WHERE article_id = ?', [id])
+
+      // Insert new questions
+      for (let i = 0; i < questions.length; i++) {
+        const questionId = randomUUID()
+
+        await connection.query(
+          'INSERT INTO questions (id, article_id, sort, body, answer, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+          [questionId, id, i + 1, questions[i].question, questions[i].answer, new Date(), new Date()],
+        )
+      }
+
+      await connection.commit()
+    } catch (error) {
+      await connection.rollback()
+      throw error
+    } finally {
+      connection.release()
+    }
+  }
+
   private extractTitle(body: string): string {
     // Extract first line or first 50 characters as title
     const firstLine = body.split('\n')[0]

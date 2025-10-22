@@ -66,4 +66,12 @@ export class MockArticleRepository implements ArticleRepository {
     this.articles.push(article)
     // Mock implementation - questions are not stored in memory
   }
+
+  async update(id: string, article: Article, questions: Question[]): Promise<void> {
+    const index = this.articles.findIndex(a => a.id === id)
+    if (index !== -1) {
+      this.articles[index] = { ...article, id }
+    }
+    // Mock implementation - questions are not stored in memory
+  }
 }

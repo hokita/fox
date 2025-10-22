@@ -10,4 +10,5 @@ export interface ArticleRepository {
   findById(id: string): Promise<Article | null>
   findByIdWithQuestions(id: string): Promise<ArticleDetail | null>
   create(article: Article, questions: Question[]): Promise<void>
+  update(id: string, article: Article, questions: Question[]): Promise<void>
 }
