@@ -1,6 +1,7 @@
 'use client'
 
-import { use, useState } from 'react'
+import { use, useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -8,46 +9,60 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Calendar, Link2, BookOpen, HelpCircle, Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { getArticleById, updateArticle } from '@/api/articles'
+import { ArticleDetail } from '@/models/article'
 
 export default function ArticleEditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  // Mock data - in real app, fetch based on params.id
-  const [date, setDate] = useState('2025-01-15')
-  const [articleTitle, setArticleTitle] = useState(
-    'The Future of Artificial Intelligence in Education',
-  )
-  const [articleUrl, setArticleUrl] = useState('https://example.com/ai-education')
-  const [articleBody, setArticleBody] = useState(
-    'Artificial intelligence is transforming the educational landscape in unprecedented ways. From personalized learning experiences to automated grading systems, AI is making education more accessible and effective for students worldwide.\n\nThe integration of AI tools in classrooms enables teachers to focus more on individual student needs while AI handles routine administrative tasks. This shift allows for more meaningful interactions between educators and learners.',
-  )
-  const [questions, setQuestions] = useState([
-    {
-      id: 1,
-      question: 'What are the main benefits of AI in education mentioned in the article?',
-      answer: 'Personalized learning experiences and automated grading systems',
-    },
-    {
-      id: 2,
-      question: 'How does AI help teachers according to the text?',
-      answer:
-        'AI handles routine administrative tasks, allowing teachers to focus more on individual student needs',
-    },
-    {
-      id: 3,
-      question: 'What is the overall impact of AI on education accessibility?',
-      answer: 'AI makes education more accessible and effective for students worldwide',
-    },
-    {
-      id: 4,
-      question: 'What type of interactions does AI enable in the classroom?',
-      answer: 'More meaningful interactions between educators and learners',
-    },
-    {
-      id: 5,
-      question: 'How is AI transforming the educational landscape?',
-      answer: 'In unprecedented ways through various technological integrations',
-    },
-  ])
+  const router = useRouter()
+  const [article, setArticle] = useState<ArticleDetail | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const [date, setDate] = useState('')
+  const [articleUrl, setArticleUrl] = useState('')
+  const [articleBody, setArticleBody] = useState('')
+  const [questions, setQuestions] = useState<
+    Array<{
+      id: number
+      question: string
+      answer: string
+    }>
+  >([])
+
+  useEffect(() => {
+    const fetchArticle = async () => {
+      try {
+        setLoading(true)
+        const data = await getArticleById(id)
+        setArticle(data)
+
+        // Format date for input (YYYY-MM-DD)
+        const studiedDate = new Date(data.studied_at)
+        const formattedDate = studiedDate.toISOString().split('T')[0]
+
+        setDate(formattedDate)
+        setArticleUrl(data.url)
+        setArticleBody(data.body)
+
+        // Convert questions to local format
+        setQuestions(
+          data.questions.map((q, index) => ({
+            id: index + 1,
+            question: q.body,
+            answer: q.answer,
+          })),
+        )
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch article')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchArticle()
+  }, [id])
 
   const handleQuestionChange = (id: number, value: string) => {
     setQuestions(questions.map(q => (q.id === id ? { ...q, question: value } : q)))
@@ -57,16 +72,55 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
     setQuestions(questions.map(q => (q.id === id ? { ...q, answer: value } : q)))
   }
 
-  const handleSave = () => {
-    const data = {
-      date,
-      articleTitle,
-      articleUrl,
-      articleBody,
-      questions,
+  const handleSave = async () => {
+    setError(null)
+    setSaving(true)
+
+    try {
+      await updateArticle(id, {
+        url: articleUrl,
+        body: articleBody,
+        studied_at: date,
+        questions: questions.map(q => ({
+          question: q.question,
+          answer: q.answer,
+        })),
+      })
+
+      alert('Article updated successfully!')
+      router.push(`/articles/${id}`)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update article')
+    } finally {
+      setSaving(false)
     }
-    console.log('Saving data:', data)
-    alert('Article and answers saved successfully!')
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <p className="text-lg text-muted-foreground">Loading article...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error && !article) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+            <p className="text-lg text-destructive">{error}</p>
+            <Button asChild variant="outline">
+              <Link href="/">Back to Articles</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -130,26 +184,12 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
             </div>
           </Card>
 
-          {/* Article Title Section */}
-          <Card className="border-border/50 bg-card p-6">
-            <div className="space-y-3">
-              <Label
-                htmlFor="title"
-                className="flex items-center gap-2 text-base font-semibold text-foreground"
-              >
-                <BookOpen className="h-5 w-5 text-accent-foreground" />
-                Article Title
-              </Label>
-              <Input
-                id="title"
-                type="text"
-                placeholder="Enter the article title..."
-                value={articleTitle}
-                onChange={e => setArticleTitle(e.target.value)}
-                className="text-base border-border/50 bg-background"
-              />
-            </div>
-          </Card>
+          {/* Error Message */}
+          {error && (
+            <Card className="border-destructive bg-destructive/10 p-4">
+              <p className="text-sm text-destructive">{error}</p>
+            </Card>
+          )}
 
           {/* Article Body Section */}
           <Card className="border-border/50 bg-card p-6">
@@ -226,10 +266,11 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
             <Button
               onClick={handleSave}
               size="lg"
-              className="gap-2 px-8 bg-primary text-primary-foreground hover:bg-primary/90"
+              disabled={saving}
+              className="gap-2 px-8 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
               <Save className="h-5 w-5" />
-              Save Progress
+              {saving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </div>

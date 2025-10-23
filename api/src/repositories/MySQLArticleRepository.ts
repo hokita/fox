@@ -152,7 +152,15 @@ export class MySQLArticleRepository implements ArticleRepository {
 
         await connection.query(
           'INSERT INTO questions (id, article_id, sort, body, answer, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [questionId, id, i + 1, questions[i].question, questions[i].answer, new Date(), new Date()],
+          [
+            questionId,
+            id,
+            i + 1,
+            questions[i].question,
+            questions[i].answer,
+            new Date(),
+            new Date(),
+          ],
         )
       }
 

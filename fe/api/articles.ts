@@ -68,3 +68,36 @@ export async function createArticle(input: CreateArticleInput): Promise<CreateAr
 
   return await response.json()
 }
+
+export interface UpdateArticleInput {
+  url: string
+  body: string
+  studied_at: string
+  questions: Array<{
+    question: string
+    answer: string
+  }>
+}
+
+export interface UpdateArticleResponse {
+  message: string
+}
+
+export async function updateArticle(
+  id: string,
+  input: UpdateArticleInput,
+): Promise<UpdateArticleResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/articles/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to update article: ${response.status}`)
+  }
+
+  return await response.json()
+}

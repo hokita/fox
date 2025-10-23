@@ -1,9 +1,9 @@
-import { Article } from './article'
+import { Article, ArticleDetail } from './article'
 
 export interface ArticlesResponse {
   articles: Article[]
 }
 
 export interface ArticleResponse {
-  article: Article
+  article: ArticleDetail
 }
