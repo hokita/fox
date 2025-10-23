@@ -1,11 +1,11 @@
 import { Router } from 'express'
-import { HelloWorldController } from '../controllers/HelloWorldController'
-import { ArticlesController } from '../controllers/ArticlesController'
-import { GetArticlesUseCase } from '../usecases/GetArticlesUseCase'
-import { GetArticleUseCase } from '../usecases/GetArticleUseCase'
-import { CreateArticleUseCase } from '../usecases/CreateArticleUseCase'
-import { UpdateArticleUseCase } from '../usecases/UpdateArticleUseCase'
-import { MySQLArticleRepository } from '../repositories/MySQLArticleRepository'
+import { HelloWorldController } from './controllers/HelloWorldController'
+import { ArticlesController } from './controllers/ArticlesController'
+import { GetArticlesUseCase } from '../application/usecases/GetArticlesUseCase'
+import { GetArticleUseCase } from '../application/usecases/GetArticleUseCase'
+import { CreateArticleUseCase } from '../application/usecases/CreateArticleUseCase'
+import { UpdateArticleUseCase } from '../application/usecases/UpdateArticleUseCase'
+import { MySQLArticleRepository } from '../infrastructure/repositories/MySQLArticleRepository'
 
 const router = Router()
 const helloWorldController = new HelloWorldController()

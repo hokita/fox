@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
-import { GetArticlesUseCase } from '../usecases/GetArticlesUseCase'
-import { GetArticleUseCase } from '../usecases/GetArticleUseCase'
-import { CreateArticleUseCase } from '../usecases/CreateArticleUseCase'
-import { UpdateArticleUseCase } from '../usecases/UpdateArticleUseCase'
+import { GetArticlesUseCase } from '../../application/usecases/GetArticlesUseCase'
+import { GetArticleUseCase } from '../../application/usecases/GetArticleUseCase'
+import { CreateArticleUseCase } from '../../application/usecases/CreateArticleUseCase'
+import { UpdateArticleUseCase } from '../../application/usecases/UpdateArticleUseCase'
 
 export class ArticlesController {
   constructor(

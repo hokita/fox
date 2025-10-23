@@ -1,5 +1,5 @@
-import { Article } from '../entities/Article'
-import { ArticleRepository, Question } from '../repositories/ArticleRepository'
+import { Article } from '../../domain/entities/Article'
+import { ArticleRepository, Question } from '../../domain/repositories/ArticleRepository'
 
 export interface UpdateArticleInput {
   url: string

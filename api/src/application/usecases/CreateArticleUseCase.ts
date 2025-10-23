@@ -1,5 +1,5 @@
-import { Article } from '../entities/Article'
-import { ArticleRepository } from '../repositories/ArticleRepository'
+import { Article } from '../../domain/entities/Article'
+import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
 import { randomUUID } from 'crypto'
 
 interface CreateArticleInput {

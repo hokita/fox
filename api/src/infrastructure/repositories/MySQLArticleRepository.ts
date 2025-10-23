@@ -1,6 +1,6 @@
-import { Article, ArticleDetail, QuestionEntity } from '../entities/Article'
-import { ArticleRepository, Question } from './ArticleRepository'
-import pool from '../infrastructure/database'
+import { Article, ArticleDetail, QuestionEntity } from '../../domain/entities/Article'
+import { ArticleRepository, Question } from '../../domain/repositories/ArticleRepository'
+import pool from '../database/config'
 import { RowDataPacket } from 'mysql2'
 import { randomUUID } from 'crypto'
 

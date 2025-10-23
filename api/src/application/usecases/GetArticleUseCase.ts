@@ -1,5 +1,5 @@
-import { ArticleDetail } from '../entities/Article'
-import { ArticleRepository } from '../repositories/ArticleRepository'
+import { ArticleDetail } from '../../domain/entities/Article'
+import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
 
 export class GetArticleUseCase {
   constructor(private articleRepository: ArticleRepository) {}

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { GetHelloWorldUseCase } from '../usecases/GetHelloWorldUseCase'
+import { GetHelloWorldUseCase } from '../../application/usecases/GetHelloWorldUseCase'
 
 export class HelloWorldController {
   private getHelloWorldUseCase: GetHelloWorldUseCase
