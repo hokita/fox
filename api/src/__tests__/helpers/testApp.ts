@@ -5,7 +5,6 @@
 import express, { Application } from 'express'
 import cors from 'cors'
 import { Router } from 'express'
-import { HelloWorldController } from '../../presentation/controllers/HelloWorldController'
 import { ArticlesController } from '../../presentation/controllers/ArticlesController'
 import { GetArticlesUseCase } from '../../application/usecases/GetArticlesUseCase'
 import { GetArticleUseCase } from '../../application/usecases/GetArticleUseCase'
@@ -22,7 +21,6 @@ export function createTestApp(db: Database.Database): Application {
 
   // Create routes with SQLite repository
   const router = Router()
-  const helloWorldController = new HelloWorldController()
 
   // Articles with SQLite repository
   const articleRepository = new SQLiteArticleRepository(db)
@@ -37,7 +35,6 @@ export function createTestApp(db: Database.Database): Application {
     updateArticleUseCase,
   )
 
-  router.get('/hello', (req, res) => helloWorldController.getHelloWorld(req, res))
   router.get('/articles', (req, res) => articlesController.getArticles(req, res))
   router.post('/articles', (req, res) => articlesController.createArticle(req, res))
   router.get('/articles/:id', (req, res) => articlesController.getArticleById(req, res))
