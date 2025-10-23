@@ -3,7 +3,7 @@
  * Creates and manages in-memory SQLite database instances.
  */
 import Database from 'better-sqlite3'
-import { SQLiteArticleRepository } from '../../infrastructure/repositories/SQLiteArticleRepository'
+import { SQLiteArticleRepository } from './SQLiteArticleRepository'
 
 export function createTestDatabase(): Database.Database {
   // Create in-memory SQLite database

@@ -10,7 +10,7 @@ import { GetArticlesUseCase } from '../../application/usecases/GetArticlesUseCas
 import { GetArticleUseCase } from '../../application/usecases/GetArticleUseCase'
 import { CreateArticleUseCase } from '../../application/usecases/CreateArticleUseCase'
 import { UpdateArticleUseCase } from '../../application/usecases/UpdateArticleUseCase'
-import { SQLiteArticleRepository } from '../../infrastructure/repositories/SQLiteArticleRepository'
+import { SQLiteArticleRepository } from './SQLiteArticleRepository'
 import Database from 'better-sqlite3'
 
 export function createTestApp(db: Database.Database): Application {
