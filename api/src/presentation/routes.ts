@@ -8,6 +8,11 @@ import { MySQLArticleRepository } from '../infrastructure/repositories/MySQLArti
 
 const router = Router()
 
+// Health check
+router.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' })
+})
+
 // Articles
 const articleRepository = new MySQLArticleRepository()
 const getArticlesUseCase = new GetArticlesUseCase(articleRepository)

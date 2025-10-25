@@ -20,7 +20,7 @@ spec:
         image: ghcr.io/hokita/fox-fe:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 3001
+        - containerPort: 3000
           name: http
         env:
         - name: NODE_ENV
@@ -36,14 +36,14 @@ spec:
             cpu: "500m"
         livenessProbe:
           httpGet:
-            path: /
-            port: 3001
+            path: /api/health
+            port: 3000
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /
-            port: 3001
+            path: /api/health
+            port: 3000
           initialDelaySeconds: 10
           periodSeconds: 5
 ---
@@ -61,6 +61,6 @@ spec:
   ports:
   - name: http
     port: 80
-    targetPort: 3001
+    targetPort: 3000
     nodePort: 30008
     protocol: TCP
