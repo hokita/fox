@@ -55,11 +55,12 @@ metadata:
   labels:
     app: fox-fe
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: fox-fe
   ports:
   - name: http
     port: 80
     targetPort: 3001
+    nodePort: 30008
     protocol: TCP

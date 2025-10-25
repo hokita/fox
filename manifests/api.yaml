@@ -72,11 +72,12 @@ metadata:
   labels:
     app: fox-api
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: fox-api
   ports:
   - name: http
     port: 3000
     targetPort: 3000
+    nodePort: 30007
     protocol: TCP
