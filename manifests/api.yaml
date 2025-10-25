@@ -25,24 +25,25 @@ spec:
         env:
         - name: NODE_ENV
           value: "production"
-        - name: DB_HOST
-          value: "mysql-service"
-        - name: DB_PORT
-          value: "3306"
+        - name: DB_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: fox-api-secrets
+              key: db-endpoint
         - name: DB_USER
           valueFrom:
             secretKeyRef:
-              name: mysql-secret
-              key: username
+              name: fox-api-secrets
+              key: db-user
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-secret
-              key: password
+              name: fox-api-secrets
+              key: db-password
         - name: DB_NAME
           valueFrom:
-            configMapKeyRef:
-              name: fox-config
+            secretKeyRef:
+              name: fox-api-secrets
               key: db-name
         resources:
           requests:
