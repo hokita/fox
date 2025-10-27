@@ -1,13 +1,7 @@
 import puppeteer, { Browser, Page } from 'puppeteer'
+import { ArticleScraper, ScrapedArticleData } from '../../domain/services/ArticleScraper'
 
-export interface ScrapedArticleData {
-  url: string
-  title: string
-  body: string
-  questions: string[]
-}
-
-export class DMMEikaiwaScraper {
+export class DMMEikaiwaScraper implements ArticleScraper {
   private browser: Browser | null = null
 
   async initialize(): Promise<void> {

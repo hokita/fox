@@ -1,10 +1,7 @@
-import {
-  DMMEikaiwaScraper,
-  ScrapedArticleData,
-} from '../../infrastructure/services/DMMEikaiwaScraper'
+import { ArticleScraper, ScrapedArticleData } from '../../domain/services/ArticleScraper'
 
 export class ScrapeArticleUseCase {
-  constructor(private scraper: DMMEikaiwaScraper) {}
+  constructor(private scraper: ArticleScraper) {}
 
   async execute(url: string): Promise<ScrapedArticleData> {
     // Validate URL
