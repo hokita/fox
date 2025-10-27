@@ -1,12 +1,12 @@
 import { Router } from 'express'
-import { ArticlesController } from './controllers/ArticlesController'
-import { GetArticlesUseCase } from '../application/usecases/GetArticlesUseCase'
-import { GetArticleUseCase } from '../application/usecases/GetArticleUseCase'
-import { CreateArticleUseCase } from '../application/usecases/CreateArticleUseCase'
-import { UpdateArticleUseCase } from '../application/usecases/UpdateArticleUseCase'
-import { ScrapeArticleUseCase } from '../application/usecases/ScrapeArticleUseCase'
-import { MySQLArticleRepository } from '../infrastructure/repositories/MySQLArticleRepository'
-import { DMMEikaiwaScraper } from '../infrastructure/services/DMMEikaiwaScraper'
+import { createArticlesController } from './controllers/ArticlesController'
+import { createGetArticlesUseCase } from '../application/usecases/GetArticlesUseCase'
+import { createGetArticleUseCase } from '../application/usecases/GetArticleUseCase'
+import { createCreateArticleUseCase } from '../application/usecases/CreateArticleUseCase'
+import { createUpdateArticleUseCase } from '../application/usecases/UpdateArticleUseCase'
+import { createScrapeArticleUseCase } from '../application/usecases/ScrapeArticleUseCase'
+import { createMySQLArticleRepository } from '../infrastructure/repositories/MySQLArticleRepository'
+import { createDMMEikaiwaScraper } from '../infrastructure/services/DMMEikaiwaScraper'
 
 const router = Router()
 
@@ -16,23 +16,23 @@ router.get('/health', (req, res) => {
 })
 
 // Articles
-const articleRepository = new MySQLArticleRepository()
-const getArticlesUseCase = new GetArticlesUseCase(articleRepository)
-const getArticleUseCase = new GetArticleUseCase(articleRepository)
-const createArticleUseCase = new CreateArticleUseCase(articleRepository)
-const updateArticleUseCase = new UpdateArticleUseCase(articleRepository)
+const articleRepository = createMySQLArticleRepository()
+const getArticlesUseCase = createGetArticlesUseCase(articleRepository)
+const getArticleUseCase = createGetArticleUseCase(articleRepository)
+const createArticleUseCase = createCreateArticleUseCase(articleRepository)
+const updateArticleUseCase = createUpdateArticleUseCase(articleRepository)
 
 // Scraper (optional, only initialized when needed)
-const scraper = new DMMEikaiwaScraper()
-const scrapeArticleUseCase = new ScrapeArticleUseCase(scraper)
+const scraper = createDMMEikaiwaScraper()
+const scrapeArticleUseCase = createScrapeArticleUseCase(scraper)
 
-const articlesController = new ArticlesController(
+const articlesController = createArticlesController({
   getArticlesUseCase,
   getArticleUseCase,
   createArticleUseCase,
   updateArticleUseCase,
   scrapeArticleUseCase,
-)
+})
 
 router.get('/articles', (req, res) => articlesController.getArticles(req, res))
 router.post('/articles', (req, res) => articlesController.createArticle(req, res))

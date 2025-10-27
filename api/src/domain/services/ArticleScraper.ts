@@ -8,4 +8,5 @@ export interface ScrapedArticleData {
 export interface ArticleScraper {
   scrapeArticle(url: string): Promise<ScrapedArticleData>
   close(): Promise<void>
+  getPageHTML?(url: string): Promise<string>
 }

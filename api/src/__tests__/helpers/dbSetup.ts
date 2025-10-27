@@ -3,7 +3,8 @@
  * Creates and manages in-memory SQLite database instances.
  */
 import Database from 'better-sqlite3'
-import { SQLiteArticleRepository } from './SQLiteArticleRepository'
+import { createSQLiteArticleRepository } from './SQLiteArticleRepository'
+import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
 
 export function createTestDatabase(): Database.Database {
   // Create in-memory SQLite database
@@ -11,8 +12,10 @@ export function createTestDatabase(): Database.Database {
   return db
 }
 
-export function createTestRepository(db: Database.Database): SQLiteArticleRepository {
-  return new SQLiteArticleRepository(db)
+export function createTestRepository(
+  db: Database.Database,
+): ArticleRepository & { clearAll: () => void } {
+  return createSQLiteArticleRepository(db)
 }
 
 export function closeTestDatabase(db: Database.Database): void {

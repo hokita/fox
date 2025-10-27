@@ -23,13 +23,19 @@ interface QuestionRow extends RowDataPacket {
   updated_at: string
 }
 
-export class MySQLArticleRepository implements ArticleRepository {
-  async findAll(): Promise<Article[]> {
+const extractTitle = (body: string): string => {
+  // Extract first line or first 50 characters as title
+  const firstLine = body.split('\n')[0]
+  return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
+}
+
+export const createMySQLArticleRepository = (): ArticleRepository => {
+  const findAll = async (): Promise<Article[]> => {
     const [rows] = await pool.query<ArticleRow[]>('SELECT * FROM articles ORDER BY studied_at DESC')
 
     return rows.map(row => ({
       id: row.id,
-      title: this.extractTitle(row.body),
+      title: extractTitle(row.body),
       url: row.url,
       body: row.body,
       studied_at: new Date(row.studied_at),
@@ -38,7 +44,7 @@ export class MySQLArticleRepository implements ArticleRepository {
     }))
   }
 
-  async findById(id: string): Promise<Article | null> {
+  const findById = async (id: string): Promise<Article | null> => {
     const [rows] = await pool.query<ArticleRow[]>('SELECT * FROM articles WHERE id = ?', [id])
 
     if (rows.length === 0) {
@@ -48,7 +54,7 @@ export class MySQLArticleRepository implements ArticleRepository {
     const row = rows[0]
     return {
       id: row.id,
-      title: this.extractTitle(row.body),
+      title: extractTitle(row.body),
       url: row.url,
       body: row.body,
       studied_at: new Date(row.studied_at),
@@ -57,8 +63,8 @@ export class MySQLArticleRepository implements ArticleRepository {
     }
   }
 
-  async findByIdWithQuestions(id: string): Promise<ArticleDetail | null> {
-    const article = await this.findById(id)
+  const findByIdWithQuestions = async (id: string): Promise<ArticleDetail | null> => {
+    const article = await findById(id)
 
     if (!article) {
       return null
@@ -85,7 +91,7 @@ export class MySQLArticleRepository implements ArticleRepository {
     }
   }
 
-  async create(article: Article, questions: Question[]): Promise<void> {
+  const create = async (article: Article, questions: Question[]): Promise<void> => {
     const connection = await pool.getConnection()
 
     try {
@@ -131,7 +137,7 @@ export class MySQLArticleRepository implements ArticleRepository {
     }
   }
 
-  async update(id: string, article: Article, questions: Question[]): Promise<void> {
+  const update = async (id: string, article: Article, questions: Question[]): Promise<void> => {
     const connection = await pool.getConnection()
 
     try {
@@ -173,9 +179,11 @@ export class MySQLArticleRepository implements ArticleRepository {
     }
   }
 
-  private extractTitle(body: string): string {
-    // Extract first line or first 50 characters as title
-    const firstLine = body.split('\n')[0]
-    return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
+  return {
+    findAll,
+    findById,
+    findByIdWithQuestions,
+    create,
+    update,
   }
 }

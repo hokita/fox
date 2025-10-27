@@ -8,17 +8,21 @@ export interface UpdateArticleInput {
   questions: Question[]
 }
 
-export class UpdateArticleUseCase {
-  constructor(private articleRepository: ArticleRepository) {}
+const extractTitle = (body: string): string => {
+  // Extract first line or first 50 characters as title
+  const firstLine = body.split('\n')[0]
+  return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
+}
 
-  async execute(id: string, input: UpdateArticleInput): Promise<{ message: string }> {
+export const createUpdateArticleUseCase = (articleRepository: ArticleRepository) => {
+  const execute = async (id: string, input: UpdateArticleInput): Promise<{ message: string }> => {
     // Check if article exists
-    const existingArticle = await this.articleRepository.findById(id)
+    const existingArticle = await articleRepository.findById(id)
     if (!existingArticle) {
       throw new Error('Article not found')
     }
 
-    const title = this.extractTitle(input.body)
+    const title = extractTitle(input.body)
 
     const article: Article = {
       id,
@@ -30,14 +34,10 @@ export class UpdateArticleUseCase {
       updated_at: new Date(),
     }
 
-    await this.articleRepository.update(id, article, input.questions)
+    await articleRepository.update(id, article, input.questions)
 
     return { message: 'Article updated successfully' }
   }
 
-  private extractTitle(body: string): string {
-    // Extract first line or first 50 characters as title
-    const firstLine = body.split('\n')[0]
-    return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
-  }
+  return { execute }
 }

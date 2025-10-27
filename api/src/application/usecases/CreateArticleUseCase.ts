@@ -12,15 +12,18 @@ interface CreateArticleInput {
   }>
 }
 
-export class CreateArticleUseCase {
-  constructor(private articleRepository: ArticleRepository) {}
+const extractTitle = (body: string): string => {
+  const firstLine = body.split('\n')[0]
+  return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
+}
 
-  async execute(input: CreateArticleInput): Promise<{ id: string; message: string }> {
+export const createCreateArticleUseCase = (articleRepository: ArticleRepository) => {
+  const execute = async (input: CreateArticleInput): Promise<{ id: string; message: string }> => {
     // Generate UUID for article ID
     const id = randomUUID()
 
     // Extract title from body
-    const title = this.extractTitle(input.body)
+    const title = extractTitle(input.body)
 
     const article: Article = {
       id,
@@ -32,7 +35,7 @@ export class CreateArticleUseCase {
       updated_at: new Date(),
     }
 
-    await this.articleRepository.create(article, input.questions)
+    await articleRepository.create(article, input.questions)
 
     return {
       id,
@@ -40,8 +43,5 @@ export class CreateArticleUseCase {
     }
   }
 
-  private extractTitle(body: string): string {
-    const firstLine = body.split('\n')[0]
-    return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
-  }
+  return { execute }
 }

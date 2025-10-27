@@ -1,33 +1,33 @@
 import puppeteer, { Browser, Page } from 'puppeteer'
 import { ArticleScraper, ScrapedArticleData } from '../../domain/services/ArticleScraper'
 
-export class DMMEikaiwaScraper implements ArticleScraper {
-  private browser: Browser | null = null
+export const createDMMEikaiwaScraper = (): ArticleScraper => {
+  let browser: Browser | null = null
 
-  async initialize(): Promise<void> {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
+  const initialize = async (): Promise<void> => {
+    if (!browser) {
+      browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
       })
     }
   }
 
-  async close(): Promise<void> {
-    if (this.browser) {
-      await this.browser.close()
-      this.browser = null
+  const close = async (): Promise<void> => {
+    if (browser) {
+      await browser.close()
+      browser = null
     }
   }
 
-  async scrapeArticle(url: string): Promise<ScrapedArticleData> {
-    await this.initialize()
+  const scrapeArticle = async (url: string): Promise<ScrapedArticleData> => {
+    await initialize()
 
-    if (!this.browser) {
+    if (!browser) {
       throw new Error('Browser not initialized')
     }
 
-    const page: Page = await this.browser.newPage()
+    const page: Page = await browser.newPage()
 
     try {
       // Set a realistic user agent
@@ -129,14 +129,14 @@ export class DMMEikaiwaScraper implements ArticleScraper {
   }
 
   // Method to scrape and get the raw HTML for debugging
-  async getPageHTML(url: string): Promise<string> {
-    await this.initialize()
+  const getPageHTML = async (url: string): Promise<string> => {
+    await initialize()
 
-    if (!this.browser) {
+    if (!browser) {
       throw new Error('Browser not initialized')
     }
 
-    const page: Page = await this.browser.newPage()
+    const page: Page = await browser.newPage()
 
     try {
       await page.setUserAgent(
@@ -154,5 +154,11 @@ export class DMMEikaiwaScraper implements ArticleScraper {
     } finally {
       await page.close()
     }
+  }
+
+  return {
+    scrapeArticle,
+    close,
+    getPageHTML,
   }
 }

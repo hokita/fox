@@ -1,16 +1,14 @@
 import { ArticleScraper, ScrapedArticleData } from '../../domain/services/ArticleScraper'
 
-export class ScrapeArticleUseCase {
-  constructor(private scraper: ArticleScraper) {}
-
-  async execute(url: string): Promise<ScrapedArticleData> {
+export const createScrapeArticleUseCase = (scraper: ArticleScraper) => {
+  const execute = async (url: string): Promise<ScrapedArticleData> => {
     // Validate URL
     if (!url.includes('eikaiwa.dmm.com/app/daily-news/article/')) {
       throw new Error('Invalid DMM Eikaiwa article URL')
     }
 
     // Scrape the article
-    const scrapedData: ScrapedArticleData = await this.scraper.scrapeArticle(url)
+    const scrapedData: ScrapedArticleData = await scraper.scrapeArticle(url)
 
     // Validate scraped data
     if (!scrapedData.title || !scrapedData.body) {
@@ -24,7 +22,9 @@ export class ScrapeArticleUseCase {
     return scrapedData
   }
 
-  async cleanup(): Promise<void> {
-    await this.scraper.close()
+  const cleanup = async (): Promise<void> => {
+    await scraper.close()
   }
+
+  return { execute, cleanup }
 }

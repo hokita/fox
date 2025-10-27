@@ -1,22 +1,52 @@
 import { Request, Response } from 'express'
-import { GetArticlesUseCase } from '../../application/usecases/GetArticlesUseCase'
-import { GetArticleUseCase } from '../../application/usecases/GetArticleUseCase'
-import { CreateArticleUseCase } from '../../application/usecases/CreateArticleUseCase'
-import { UpdateArticleUseCase } from '../../application/usecases/UpdateArticleUseCase'
-import { ScrapeArticleUseCase } from '../../application/usecases/ScrapeArticleUseCase'
+import { Article, ArticleDetail } from '../../domain/entities/Article'
+import { ScrapedArticleData } from '../../domain/services/ArticleScraper'
 
-export class ArticlesController {
-  constructor(
-    private getArticlesUseCase: GetArticlesUseCase,
-    private getArticleUseCase: GetArticleUseCase,
-    private createArticleUseCase: CreateArticleUseCase,
-    private updateArticleUseCase: UpdateArticleUseCase,
-    private scrapeArticleUseCase?: ScrapeArticleUseCase,
-  ) {}
+interface GetArticlesUseCase {
+  execute: () => Promise<Article[]>
+}
 
-  async getArticles(req: Request, res: Response): Promise<void> {
+interface GetArticleUseCase {
+  execute: (id: string) => Promise<ArticleDetail | null>
+}
+
+interface CreateArticleUseCase {
+  execute: (input: {
+    url: string
+    body: string
+    studied_at: string
+    questions: Array<{ question: string; answer: string }>
+  }) => Promise<{ id: string; message: string }>
+}
+
+interface UpdateArticleUseCase {
+  execute: (
+    id: string,
+    input: {
+      url: string
+      body: string
+      studied_at: string
+      questions: Array<{ question: string; answer: string }>
+    },
+  ) => Promise<{ message: string }>
+}
+
+interface ScrapeArticleUseCase {
+  execute: (url: string) => Promise<ScrapedArticleData>
+}
+
+interface UseCases {
+  getArticlesUseCase: GetArticlesUseCase
+  getArticleUseCase: GetArticleUseCase
+  createArticleUseCase: CreateArticleUseCase
+  updateArticleUseCase: UpdateArticleUseCase
+  scrapeArticleUseCase?: ScrapeArticleUseCase
+}
+
+export const createArticlesController = (useCases: UseCases) => {
+  const getArticles = async (req: Request, res: Response): Promise<void> => {
     try {
-      const articles = await this.getArticlesUseCase.execute()
+      const articles = await useCases.getArticlesUseCase.execute()
       res.json({ articles })
     } catch (error) {
       console.error('Error fetching articles:', error)
@@ -24,10 +54,10 @@ export class ArticlesController {
     }
   }
 
-  async getArticleById(req: Request, res: Response): Promise<void> {
+  const getArticleById = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params
-      const article = await this.getArticleUseCase.execute(id)
+      const article = await useCases.getArticleUseCase.execute(id)
 
       if (!article) {
         res.status(404).json({ error: 'Article not found' })
@@ -40,7 +70,7 @@ export class ArticlesController {
     }
   }
 
-  async createArticle(req: Request, res: Response): Promise<void> {
+  const createArticle = async (req: Request, res: Response): Promise<void> => {
     try {
       const { url, body, studied_at, questions } = req.body
 
@@ -49,7 +79,7 @@ export class ArticlesController {
         return
       }
 
-      const result = await this.createArticleUseCase.execute({
+      const result = await useCases.createArticleUseCase.execute({
         url,
         body,
         studied_at,
@@ -63,7 +93,7 @@ export class ArticlesController {
     }
   }
 
-  async updateArticle(req: Request, res: Response): Promise<void> {
+  const updateArticle = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params
       const { url, body, studied_at, questions } = req.body
@@ -73,7 +103,7 @@ export class ArticlesController {
         return
       }
 
-      const result = await this.updateArticleUseCase.execute(id, {
+      const result = await useCases.updateArticleUseCase.execute(id, {
         url,
         body,
         studied_at,
@@ -91,9 +121,9 @@ export class ArticlesController {
     }
   }
 
-  async scrapeArticle(req: Request, res: Response): Promise<void> {
+  const scrapeArticle = async (req: Request, res: Response): Promise<void> => {
     try {
-      if (!this.scrapeArticleUseCase) {
+      if (!useCases.scrapeArticleUseCase) {
         res.status(501).json({ error: 'Scraping feature not available' })
         return
       }
@@ -105,7 +135,7 @@ export class ArticlesController {
         return
       }
 
-      const scrapedData = await this.scrapeArticleUseCase.execute(url)
+      const scrapedData = await useCases.scrapeArticleUseCase.execute(url)
 
       res.status(200).json(scrapedData)
     } catch (error) {
@@ -122,5 +152,13 @@ export class ArticlesController {
       }
       res.status(500).json({ error: 'Internal server error' })
     }
+  }
+
+  return {
+    getArticles,
+    getArticleById,
+    createArticle,
+    updateArticle,
+    scrapeArticle,
   }
 }

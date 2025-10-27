@@ -1,10 +1,10 @@
 import { Article } from '../../domain/entities/Article'
 import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
 
-export class GetArticlesUseCase {
-  constructor(private articleRepository: ArticleRepository) {}
-
-  async execute(): Promise<Article[]> {
-    return await this.articleRepository.findAll()
+export const createGetArticlesUseCase = (articleRepository: ArticleRepository) => {
+  const execute = async (): Promise<Article[]> => {
+    return await articleRepository.findAll()
   }
+
+  return { execute }
 }

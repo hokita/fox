@@ -26,46 +26,46 @@ interface QuestionRow {
   updated_at: string
 }
 
-export class SQLiteArticleRepository implements ArticleRepository {
-  private db: Database.Database
+const extractTitle = (body: string): string => {
+  const firstLine = body.split('\n')[0]
+  return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
+}
 
-  constructor(db: Database.Database) {
-    this.db = db
-    this.initializeSchema()
-  }
+const initializeSchema = (db: Database.Database): void => {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS articles (
+      id TEXT PRIMARY KEY,
+      url TEXT NOT NULL,
+      body TEXT NOT NULL,
+      studied_at TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
 
-  private initializeSchema(): void {
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS articles (
-        id TEXT PRIMARY KEY,
-        url TEXT NOT NULL,
-        body TEXT NOT NULL,
-        studied_at TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-      );
+    CREATE TABLE IF NOT EXISTS questions (
+      id TEXT PRIMARY KEY,
+      article_id TEXT NOT NULL,
+      sort INTEGER NOT NULL,
+      body TEXT NOT NULL,
+      answer TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE
+    );
+  `)
+}
 
-      CREATE TABLE IF NOT EXISTS questions (
-        id TEXT PRIMARY KEY,
-        article_id TEXT NOT NULL,
-        sort INTEGER NOT NULL,
-        body TEXT NOT NULL,
-        answer TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE
-      );
-    `)
-  }
+export const createSQLiteArticleRepository = (
+  db: Database.Database,
+): ArticleRepository & { clearAll: () => void } => {
+  initializeSchema(db)
 
-  async findAll(): Promise<Article[]> {
-    const rows = this.db
-      .prepare('SELECT * FROM articles ORDER BY studied_at DESC')
-      .all() as ArticleRow[]
+  const findAll = async (): Promise<Article[]> => {
+    const rows = db.prepare('SELECT * FROM articles ORDER BY studied_at DESC').all() as ArticleRow[]
 
     return rows.map(row => ({
       id: row.id,
-      title: this.extractTitle(row.body),
+      title: extractTitle(row.body),
       url: row.url,
       body: row.body,
       studied_at: new Date(row.studied_at),
@@ -74,10 +74,8 @@ export class SQLiteArticleRepository implements ArticleRepository {
     }))
   }
 
-  async findById(id: string): Promise<Article | null> {
-    const row = this.db.prepare('SELECT * FROM articles WHERE id = ?').get(id) as
-      | ArticleRow
-      | undefined
+  const findById = async (id: string): Promise<Article | null> => {
+    const row = db.prepare('SELECT * FROM articles WHERE id = ?').get(id) as ArticleRow | undefined
 
     if (!row) {
       return null
@@ -85,7 +83,7 @@ export class SQLiteArticleRepository implements ArticleRepository {
 
     return {
       id: row.id,
-      title: this.extractTitle(row.body),
+      title: extractTitle(row.body),
       url: row.url,
       body: row.body,
       studied_at: new Date(row.studied_at),
@@ -94,14 +92,14 @@ export class SQLiteArticleRepository implements ArticleRepository {
     }
   }
 
-  async findByIdWithQuestions(id: string): Promise<ArticleDetail | null> {
-    const article = await this.findById(id)
+  const findByIdWithQuestions = async (id: string): Promise<ArticleDetail | null> => {
+    const article = await findById(id)
 
     if (!article) {
       return null
     }
 
-    const questionRows = this.db
+    const questionRows = db
       .prepare('SELECT * FROM questions WHERE article_id = ? ORDER BY sort ASC')
       .all(id) as QuestionRow[]
 
@@ -121,16 +119,16 @@ export class SQLiteArticleRepository implements ArticleRepository {
     }
   }
 
-  async create(article: Article, questions: Question[]): Promise<void> {
-    const insertArticle = this.db.prepare(
+  const create = async (article: Article, questions: Question[]): Promise<void> => {
+    const insertArticle = db.prepare(
       'INSERT INTO articles (id, url, body, studied_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
     )
 
-    const insertQuestion = this.db.prepare(
+    const insertQuestion = db.prepare(
       'INSERT INTO questions (id, article_id, sort, body, answer, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
     )
 
-    const transaction = this.db.transaction(() => {
+    const transaction = db.transaction(() => {
       insertArticle.run(
         article.id,
         article.url,
@@ -157,18 +155,18 @@ export class SQLiteArticleRepository implements ArticleRepository {
     transaction()
   }
 
-  async update(id: string, article: Article, questions: Question[]): Promise<void> {
-    const updateArticle = this.db.prepare(
+  const update = async (id: string, article: Article, questions: Question[]): Promise<void> => {
+    const updateArticle = db.prepare(
       'UPDATE articles SET url = ?, body = ?, studied_at = ?, updated_at = ? WHERE id = ?',
     )
 
-    const deleteQuestions = this.db.prepare('DELETE FROM questions WHERE article_id = ?')
+    const deleteQuestions = db.prepare('DELETE FROM questions WHERE article_id = ?')
 
-    const insertQuestion = this.db.prepare(
+    const insertQuestion = db.prepare(
       'INSERT INTO questions (id, article_id, sort, body, answer, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
     )
 
-    const transaction = this.db.transaction(() => {
+    const transaction = db.transaction(() => {
       updateArticle.run(
         article.url,
         article.body,
@@ -196,14 +194,18 @@ export class SQLiteArticleRepository implements ArticleRepository {
     transaction()
   }
 
-  private extractTitle(body: string): string {
-    const firstLine = body.split('\n')[0]
-    return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
+  // Test utility method to clear all data
+  const clearAll = (): void => {
+    db.exec('DELETE FROM questions')
+    db.exec('DELETE FROM articles')
   }
 
-  // Test utility method to clear all data
-  clearAll(): void {
-    this.db.exec('DELETE FROM questions')
-    this.db.exec('DELETE FROM articles')
+  return {
+    findAll,
+    findById,
+    findByIdWithQuestions,
+    create,
+    update,
+    clearAll,
   }
 }

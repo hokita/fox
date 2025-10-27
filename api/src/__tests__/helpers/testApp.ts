@@ -5,12 +5,12 @@
 import express, { Application } from 'express'
 import cors from 'cors'
 import { Router } from 'express'
-import { ArticlesController } from '../../presentation/controllers/ArticlesController'
-import { GetArticlesUseCase } from '../../application/usecases/GetArticlesUseCase'
-import { GetArticleUseCase } from '../../application/usecases/GetArticleUseCase'
-import { CreateArticleUseCase } from '../../application/usecases/CreateArticleUseCase'
-import { UpdateArticleUseCase } from '../../application/usecases/UpdateArticleUseCase'
-import { SQLiteArticleRepository } from './SQLiteArticleRepository'
+import { createArticlesController } from '../../presentation/controllers/ArticlesController'
+import { createGetArticlesUseCase } from '../../application/usecases/GetArticlesUseCase'
+import { createGetArticleUseCase } from '../../application/usecases/GetArticleUseCase'
+import { createCreateArticleUseCase } from '../../application/usecases/CreateArticleUseCase'
+import { createUpdateArticleUseCase } from '../../application/usecases/UpdateArticleUseCase'
+import { createSQLiteArticleRepository } from './SQLiteArticleRepository'
 import Database from 'better-sqlite3'
 
 export function createTestApp(db: Database.Database): Application {
@@ -23,17 +23,17 @@ export function createTestApp(db: Database.Database): Application {
   const router = Router()
 
   // Articles with SQLite repository
-  const articleRepository = new SQLiteArticleRepository(db)
-  const getArticlesUseCase = new GetArticlesUseCase(articleRepository)
-  const getArticleUseCase = new GetArticleUseCase(articleRepository)
-  const createArticleUseCase = new CreateArticleUseCase(articleRepository)
-  const updateArticleUseCase = new UpdateArticleUseCase(articleRepository)
-  const articlesController = new ArticlesController(
+  const articleRepository = createSQLiteArticleRepository(db)
+  const getArticlesUseCase = createGetArticlesUseCase(articleRepository)
+  const getArticleUseCase = createGetArticleUseCase(articleRepository)
+  const createArticleUseCase = createCreateArticleUseCase(articleRepository)
+  const updateArticleUseCase = createUpdateArticleUseCase(articleRepository)
+  const articlesController = createArticlesController({
     getArticlesUseCase,
     getArticleUseCase,
     createArticleUseCase,
     updateArticleUseCase,
-  )
+  })
 
   router.get('/articles', (req, res) => articlesController.getArticles(req, res))
   router.post('/articles', (req, res) => articlesController.createArticle(req, res))
