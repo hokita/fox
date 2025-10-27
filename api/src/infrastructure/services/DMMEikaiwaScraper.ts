@@ -56,19 +56,24 @@ export class DMMEikaiwaScraper implements ArticleScraper {
         if (!exercise2) return ''
 
         const paragraphs: string[] = []
-        const textElements = exercise2.querySelectorAll('[lang="en"]')
+        // Extract by paragraph tags instead of individual spans
+        const paragraphElements = exercise2.querySelectorAll('p')
 
-        for (const el of Array.from(textElements)) {
-          const text = (el as HTMLElement).textContent?.trim()
-          // Filter out instructions and short text, keep only article paragraphs
+        for (const p of Array.from(paragraphElements)) {
+          const text = (p as HTMLElement).textContent?.trim()
+          // Filter out instructions, short text, and Japanese text
           if (
             text &&
             text.length > 30 &&
             !text.includes('Exercise') &&
             !text.includes('Read the article') &&
-            !text.includes('Repeat each paragraph')
+            !text.includes('Repeat each paragraph') &&
+            // Exclude paragraphs with Japanese characters (Hiragana, Katakana, Kanji)
+            !/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(text)
           ) {
-            paragraphs.push(text)
+            // Clean up whitespace within the paragraph
+            const cleanedText = text.replace(/\s+/g, ' ').trim()
+            paragraphs.push(cleanedText)
           }
         }
 
