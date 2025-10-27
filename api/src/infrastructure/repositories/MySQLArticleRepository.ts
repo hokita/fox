@@ -1,8 +1,8 @@
-import { Article, ArticleDetail, QuestionEntity } from '../../domain/entities/Article'
-import { ArticleRepository, Question } from '../../domain/repositories/ArticleRepository'
+import { Article, ArticleDetail, Question } from '../../domain/entities/Article'
+import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
+import { extractTitle } from '../../domain/services/TitleExtractor'
 import pool from '../database/config'
 import { RowDataPacket } from 'mysql2'
-import { randomUUID } from 'crypto'
 
 interface ArticleRow extends RowDataPacket {
   id: string
@@ -21,12 +21,6 @@ interface QuestionRow extends RowDataPacket {
   answer: string
   created_at: string
   updated_at: string
-}
-
-const extractTitle = (body: string): string => {
-  // Extract first line or first 50 characters as title
-  const firstLine = body.split('\n')[0]
-  return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
 }
 
 export const createMySQLArticleRepository = (): ArticleRepository => {
@@ -75,7 +69,7 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
       [id],
     )
 
-    const questions: QuestionEntity[] = questionRows.map(row => ({
+    const questions: Question[] = questionRows.map(row => ({
       id: row.id,
       article_id: row.article_id,
       sort: row.sort,
@@ -111,19 +105,17 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
       )
 
       // Insert questions
-      for (let i = 0; i < questions.length; i++) {
-        const questionId = randomUUID()
-
+      for (const question of questions) {
         await connection.query(
           'INSERT INTO questions (id, article_id, sort, body, answer, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
           [
-            questionId,
-            article.id,
-            i + 1,
-            questions[i].question,
-            questions[i].answer,
-            new Date(),
-            new Date(),
+            question.id,
+            question.article_id,
+            question.sort,
+            question.body,
+            question.answer,
+            question.created_at,
+            question.updated_at,
           ],
         )
       }
@@ -153,19 +145,17 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
       await connection.query('DELETE FROM questions WHERE article_id = ?', [id])
 
       // Insert new questions
-      for (let i = 0; i < questions.length; i++) {
-        const questionId = randomUUID()
-
+      for (const question of questions) {
         await connection.query(
           'INSERT INTO questions (id, article_id, sort, body, answer, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
           [
-            questionId,
-            id,
-            i + 1,
-            questions[i].question,
-            questions[i].answer,
-            new Date(),
-            new Date(),
+            question.id,
+            question.article_id,
+            question.sort,
+            question.body,
+            question.answer,
+            question.created_at,
+            question.updated_at,
           ],
         )
       }

@@ -11,23 +11,21 @@ interface GetArticleUseCase {
 }
 
 interface CreateArticleUseCase {
-  execute: (input: {
-    url: string
-    body: string
-    studied_at: string
-    questions: Array<{ question: string; answer: string }>
-  }) => Promise<{ id: string; message: string }>
+  execute: (
+    url: string,
+    body: string,
+    studied_at: Date,
+    questions: Array<{ question: string; answer: string }>,
+  ) => Promise<{ id: string; message: string }>
 }
 
 interface UpdateArticleUseCase {
   execute: (
     id: string,
-    input: {
-      url: string
-      body: string
-      studied_at: string
-      questions: Array<{ question: string; answer: string }>
-    },
+    url: string,
+    body: string,
+    studied_at: Date,
+    questions: Array<{ question: string; answer: string }>,
   ) => Promise<{ message: string }>
 }
 
@@ -79,12 +77,15 @@ export const createArticlesController = (useCases: UseCases) => {
         return
       }
 
-      const result = await useCases.createArticleUseCase.execute({
+      // Transform DTO to domain parameters
+      const studiedAtDate = new Date(studied_at)
+
+      const result = await useCases.createArticleUseCase.execute(
         url,
         body,
-        studied_at,
+        studiedAtDate,
         questions,
-      })
+      )
 
       res.status(201).json(result)
     } catch (error) {
@@ -103,12 +104,16 @@ export const createArticlesController = (useCases: UseCases) => {
         return
       }
 
-      const result = await useCases.updateArticleUseCase.execute(id, {
+      // Transform DTO to domain parameters
+      const studiedAtDate = new Date(studied_at)
+
+      const result = await useCases.updateArticleUseCase.execute(
+        id,
         url,
         body,
-        studied_at,
+        studiedAtDate,
         questions,
-      })
+      )
 
       res.json(result)
     } catch (error) {

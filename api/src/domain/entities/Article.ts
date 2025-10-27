@@ -8,7 +8,7 @@ export interface Article {
   updated_at: Date
 }
 
-export interface QuestionEntity {
+export interface Question {
   id: string
   article_id: string
   sort: number
@@ -19,5 +19,5 @@ export interface QuestionEntity {
 }
 
 export interface ArticleDetail extends Article {
-  questions: QuestionEntity[]
+  questions: Question[]
 }

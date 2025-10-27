@@ -3,9 +3,9 @@
  * Uses in-memory SQLite database to avoid dependency on MySQL during tests.
  */
 import Database from 'better-sqlite3'
-import { Article, ArticleDetail, QuestionEntity } from '../../domain/entities/Article'
-import { ArticleRepository, Question } from '../../domain/repositories/ArticleRepository'
-import { randomUUID } from 'crypto'
+import { Article, ArticleDetail, Question } from '../../domain/entities/Article'
+import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
+import { extractTitle } from '../../domain/services/TitleExtractor'
 
 interface ArticleRow {
   id: string
@@ -24,11 +24,6 @@ interface QuestionRow {
   answer: string
   created_at: string
   updated_at: string
-}
-
-const extractTitle = (body: string): string => {
-  const firstLine = body.split('\n')[0]
-  return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
 }
 
 const initializeSchema = (db: Database.Database): void => {
@@ -103,7 +98,7 @@ export const createSQLiteArticleRepository = (
       .prepare('SELECT * FROM questions WHERE article_id = ? ORDER BY sort ASC')
       .all(id) as QuestionRow[]
 
-    const questions: QuestionEntity[] = questionRows.map(row => ({
+    const questions: Question[] = questionRows.map(row => ({
       id: row.id,
       article_id: row.article_id,
       sort: row.sort,
@@ -138,16 +133,15 @@ export const createSQLiteArticleRepository = (
         article.updated_at.toISOString(),
       )
 
-      questions.forEach((q, i) => {
-        const questionId = randomUUID()
+      questions.forEach(q => {
         insertQuestion.run(
-          questionId,
-          article.id,
-          i + 1,
-          q.question,
+          q.id,
+          q.article_id,
+          q.sort,
+          q.body,
           q.answer,
-          new Date().toISOString(),
-          new Date().toISOString(),
+          q.created_at.toISOString(),
+          q.updated_at.toISOString(),
         )
       })
     })
@@ -177,16 +171,15 @@ export const createSQLiteArticleRepository = (
 
       deleteQuestions.run(id)
 
-      questions.forEach((q, i) => {
-        const questionId = randomUUID()
+      questions.forEach(q => {
         insertQuestion.run(
-          questionId,
-          id,
-          i + 1,
-          q.question,
+          q.id,
+          q.article_id,
+          q.sort,
+          q.body,
           q.answer,
-          new Date().toISOString(),
-          new Date().toISOString(),
+          q.created_at.toISOString(),
+          q.updated_at.toISOString(),
         )
       })
     })

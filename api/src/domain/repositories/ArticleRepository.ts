@@ -1,9 +1,4 @@
-import { Article, ArticleDetail } from '../entities/Article'
-
-export interface Question {
-  question: string
-  answer: string
-}
+import { Article, ArticleDetail, Question } from '../entities/Article'
 
 export interface ArticleRepository {
   findAll(): Promise<Article[]>

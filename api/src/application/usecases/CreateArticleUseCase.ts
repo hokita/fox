@@ -1,41 +1,44 @@
-import { Article } from '../../domain/entities/Article'
+import { Article, Question } from '../../domain/entities/Article'
 import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
+import { extractTitle } from '../../domain/services/TitleExtractor'
 import { randomUUID } from 'crypto'
 
-interface CreateArticleInput {
-  url: string
-  body: string
-  studied_at: string
-  questions: Array<{
-    question: string
-    answer: string
-  }>
-}
-
-const extractTitle = (body: string): string => {
-  const firstLine = body.split('\n')[0]
-  return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
-}
-
 export const createCreateArticleUseCase = (articleRepository: ArticleRepository) => {
-  const execute = async (input: CreateArticleInput): Promise<{ id: string; message: string }> => {
+  const execute = async (
+    url: string,
+    body: string,
+    studied_at: Date,
+    questionInputs: Array<{ question: string; answer: string }>,
+  ): Promise<{ id: string; message: string }> => {
     // Generate UUID for article ID
     const id = randomUUID()
 
     // Extract title from body
-    const title = extractTitle(input.body)
+    const title = extractTitle(body)
 
+    // Create domain entity
     const article: Article = {
       id,
-      url: input.url,
-      body: input.body,
+      url,
+      body,
       title,
-      studied_at: new Date(input.studied_at),
+      studied_at,
       created_at: new Date(),
       updated_at: new Date(),
     }
 
-    await articleRepository.create(article, input.questions)
+    // Convert question inputs to question entities
+    const questions: Question[] = questionInputs.map((input, index) => ({
+      id: randomUUID(),
+      article_id: id,
+      sort: index + 1,
+      body: input.question,
+      answer: input.answer,
+      created_at: new Date(),
+      updated_at: new Date(),
+    }))
+
+    await articleRepository.create(article, questions)
 
     return {
       id,

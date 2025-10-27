@@ -1,40 +1,47 @@
-import { Article } from '../../domain/entities/Article'
-import { ArticleRepository, Question } from '../../domain/repositories/ArticleRepository'
-
-export interface UpdateArticleInput {
-  url: string
-  body: string
-  studied_at: string
-  questions: Question[]
-}
-
-const extractTitle = (body: string): string => {
-  // Extract first line or first 50 characters as title
-  const firstLine = body.split('\n')[0]
-  return firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
-}
+import { Article, Question } from '../../domain/entities/Article'
+import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
+import { extractTitle } from '../../domain/services/TitleExtractor'
+import { randomUUID } from 'crypto'
 
 export const createUpdateArticleUseCase = (articleRepository: ArticleRepository) => {
-  const execute = async (id: string, input: UpdateArticleInput): Promise<{ message: string }> => {
+  const execute = async (
+    id: string,
+    url: string,
+    body: string,
+    studied_at: Date,
+    questionInputs: Array<{ question: string; answer: string }>,
+  ): Promise<{ message: string }> => {
     // Check if article exists
     const existingArticle = await articleRepository.findById(id)
     if (!existingArticle) {
       throw new Error('Article not found')
     }
 
-    const title = extractTitle(input.body)
+    const title = extractTitle(body)
 
+    // Create updated domain entity
     const article: Article = {
       id,
-      url: input.url,
-      body: input.body,
+      url,
+      body,
       title,
-      studied_at: new Date(input.studied_at),
+      studied_at,
       created_at: existingArticle.created_at,
       updated_at: new Date(),
     }
 
-    await articleRepository.update(id, article, input.questions)
+    // Convert question inputs to question entities
+    const questions: Question[] = questionInputs.map((input, index) => ({
+      id: randomUUID(),
+      article_id: id,
+      sort: index + 1,
+      body: input.question,
+      answer: input.answer,
+      created_at: new Date(),
+      updated_at: new Date(),
+    }))
+
+    await articleRepository.update(id, article, questions)
 
     return { message: 'Article updated successfully' }
   }
