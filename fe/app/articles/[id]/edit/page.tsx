@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Calendar, Link2, BookOpen, HelpCircle, Save, ArrowLeft, Download } from 'lucide-react'
+import { Calendar, Link2, BookOpen, HelpCircle, Save, ArrowLeft, Download, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { getArticleById, updateArticle, scrapeArticle } from '@/api/articles'
 import { ArticleDetail } from '@/models/article'
@@ -95,7 +95,7 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
         })),
       )
 
-      alert('Article scraped successfully! Review the data and save when ready.')
+      // Successfully scraped - no alert needed, form is auto-populated
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to scrape article')
     } finally {
@@ -127,7 +127,7 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
         })),
       })
 
-      alert('Article updated successfully!')
+      // Navigate back to the article
       router.push(`/articles/${id}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update article')
@@ -165,6 +165,17 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Loading Overlay */}
+      {scraping && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-4 rounded-lg bg-card p-8 shadow-lg">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="text-lg font-medium text-foreground">Scraping article...</p>
+            <p className="text-sm text-muted-foreground">This may take a few seconds</p>
+          </div>
+        </div>
+      )}
+
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header with back button */}
         <div className="mb-8">
@@ -227,7 +238,11 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
                     variant="secondary"
                     className="gap-2 whitespace-nowrap"
                   >
-                    <Download className="h-4 w-4" />
+                    {scraping ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
                     {scraping ? 'Scraping...' : 'Scrape'}
                   </Button>
                 </div>
