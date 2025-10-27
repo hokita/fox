@@ -51,7 +51,7 @@ export default function EnglishLearningPage() {
           id: index + 1,
           question: q,
           answer: '',
-        }))
+        })),
       )
 
       alert('Article scraped successfully! Review the data and save when ready.')
@@ -165,7 +165,8 @@ export default function EnglishLearningPage() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Enter a DMM Eikaiwa Daily News URL and click Scrape to auto-fill the article and questions
+                  Enter a DMM Eikaiwa Daily News URL and click Scrape to auto-fill the article and
+                  questions
                 </p>
               </div>
             </div>
