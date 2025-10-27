@@ -7,7 +7,16 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Calendar, Link2, BookOpen, HelpCircle, Save, ArrowLeft, Download, Loader2 } from 'lucide-react'
+import {
+  Calendar,
+  Link2,
+  BookOpen,
+  HelpCircle,
+  Save,
+  ArrowLeft,
+  Download,
+  Loader2,
+} from 'lucide-react'
 import Link from 'next/link'
 import { getArticleById, updateArticle, scrapeArticle } from '@/api/articles'
 import { ArticleDetail } from '@/models/article'
