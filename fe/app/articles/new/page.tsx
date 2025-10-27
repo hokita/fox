@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Calendar, Link2, BookOpen, HelpCircle, Save, ArrowLeft } from 'lucide-react'
+import { Calendar, Link2, BookOpen, HelpCircle, Save, ArrowLeft, Download } from 'lucide-react'
 import Link from 'next/link'
-import { createArticle } from '@/api/articles'
+import { createArticle, scrapeArticle } from '@/api/articles'
 
 export default function EnglishLearningPage() {
   const router = useRouter()
@@ -24,7 +24,43 @@ export default function EnglishLearningPage() {
     { id: 5, question: '', answer: '' },
   ])
   const [loading, setLoading] = useState(false)
+  const [scraping, setScraping] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const handleScrape = async () => {
+    if (!articleUrl) {
+      setError('Please enter a URL to scrape')
+      return
+    }
+
+    if (!articleUrl.includes('eikaiwa.dmm.com/app/daily-news/article/')) {
+      setError('Please enter a valid DMM Eikaiwa Daily News article URL')
+      return
+    }
+
+    setError(null)
+    setScraping(true)
+
+    try {
+      const scrapedData = await scrapeArticle(articleUrl)
+
+      // Populate the form with scraped data
+      setArticleBody(scrapedData.body)
+      setQuestions(
+        scrapedData.questions.map((q, index) => ({
+          id: index + 1,
+          question: q,
+          answer: '',
+        }))
+      )
+
+      alert('Article scraped successfully! Review the data and save when ready.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to scrape article')
+    } finally {
+      setScraping(false)
+    }
+  }
 
   const handleQuestionChange = (id: number, value: string) => {
     setQuestions(questions.map(q => (q.id === id ? { ...q, question: value } : q)))
@@ -109,14 +145,28 @@ export default function EnglishLearningPage() {
                   <Link2 className="h-4 w-4 text-accent-foreground" />
                   Article URL
                 </Label>
-                <Input
-                  id="url"
-                  type="url"
-                  placeholder="https://example.com/article"
-                  value={articleUrl}
-                  onChange={e => setArticleUrl(e.target.value)}
-                  className="w-full border-border/50 bg-background"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="url"
+                    type="url"
+                    placeholder="https://eikaiwa.dmm.com/app/daily-news/article/..."
+                    value={articleUrl}
+                    onChange={e => setArticleUrl(e.target.value)}
+                    className="flex-1 border-border/50 bg-background"
+                  />
+                  <Button
+                    onClick={handleScrape}
+                    disabled={scraping || !articleUrl}
+                    variant="secondary"
+                    className="gap-2 whitespace-nowrap"
+                  >
+                    <Download className="h-4 w-4" />
+                    {scraping ? 'Scraping...' : 'Scrape'}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Enter a DMM Eikaiwa Daily News URL and click Scrape to auto-fill the article and questions
+                </p>
               </div>
             </div>
           </Card>

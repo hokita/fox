@@ -101,3 +101,27 @@ export async function updateArticle(
 
   return await response.json()
 }
+
+export interface ScrapedArticleData {
+  url: string
+  title: string
+  body: string
+  questions: string[]
+}
+
+export async function scrapeArticle(url: string): Promise<ScrapedArticleData> {
+  const response = await fetch(`${API_BASE_URL}/api/articles/scrape`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ url }),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `Failed to scrape article: ${response.status}`)
+  }
+
+  return await response.json()
+}

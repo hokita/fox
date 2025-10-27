@@ -3,6 +3,7 @@ import { GetArticlesUseCase } from '../../application/usecases/GetArticlesUseCas
 import { GetArticleUseCase } from '../../application/usecases/GetArticleUseCase'
 import { CreateArticleUseCase } from '../../application/usecases/CreateArticleUseCase'
 import { UpdateArticleUseCase } from '../../application/usecases/UpdateArticleUseCase'
+import { ScrapeArticleUseCase } from '../../application/usecases/ScrapeArticleUseCase'
 
 export class ArticlesController {
   constructor(
@@ -10,6 +11,7 @@ export class ArticlesController {
     private getArticleUseCase: GetArticleUseCase,
     private createArticleUseCase: CreateArticleUseCase,
     private updateArticleUseCase: UpdateArticleUseCase,
+    private scrapeArticleUseCase?: ScrapeArticleUseCase,
   ) {}
 
   async getArticles(req: Request, res: Response): Promise<void> {
@@ -85,6 +87,39 @@ export class ArticlesController {
         return
       }
       console.error('Error updating article:', error)
+      res.status(500).json({ error: 'Internal server error' })
+    }
+  }
+
+  async scrapeArticle(req: Request, res: Response): Promise<void> {
+    try {
+      if (!this.scrapeArticleUseCase) {
+        res.status(501).json({ error: 'Scraping feature not available' })
+        return
+      }
+
+      const { url } = req.body
+
+      if (!url) {
+        res.status(400).json({ error: 'Missing required field: url' })
+        return
+      }
+
+      const scrapedData = await this.scrapeArticleUseCase.execute(url)
+
+      res.status(200).json(scrapedData)
+    } catch (error) {
+      console.error('Error scraping article:', error)
+      if (error instanceof Error) {
+        if (error.message.includes('Invalid DMM Eikaiwa article URL')) {
+          res.status(400).json({ error: error.message })
+          return
+        }
+        if (error.message.includes('Failed to scrape article')) {
+          res.status(422).json({ error: error.message })
+          return
+        }
+      }
       res.status(500).json({ error: 'Internal server error' })
     }
   }
