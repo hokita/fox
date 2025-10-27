@@ -15,6 +15,7 @@ export default function EnglishLearningPage() {
   const router = useRouter()
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [articleUrl, setArticleUrl] = useState('')
+  const [articleTitle, setArticleTitle] = useState('')
   const [articleBody, setArticleBody] = useState('')
   const [questions, setQuestions] = useState([
     { id: 1, question: '', answer: '' },
@@ -45,6 +46,7 @@ export default function EnglishLearningPage() {
       const scrapedData = await scrapeArticle(articleUrl)
 
       // Populate the form with scraped data
+      setArticleTitle(scrapedData.title)
       setArticleBody(scrapedData.body)
       setQuestions(
         scrapedData.questions.map((q, index) => ({
@@ -77,6 +79,7 @@ export default function EnglishLearningPage() {
     try {
       const result = await createArticle({
         url: articleUrl,
+        title: articleTitle,
         body: articleBody,
         studied_at: date,
         questions: questions.map(q => ({
@@ -178,6 +181,27 @@ export default function EnglishLearningPage() {
               <p className="text-sm text-destructive">{error}</p>
             </Card>
           )}
+
+          {/* Article Title Section */}
+          <Card className="border-border/50 bg-card p-6">
+            <div className="space-y-3">
+              <Label
+                htmlFor="title"
+                className="flex items-center gap-2 text-base font-semibold text-foreground"
+              >
+                <BookOpen className="h-5 w-5 text-accent-foreground" />
+                Article Title
+              </Label>
+              <Input
+                id="title"
+                type="text"
+                placeholder="Enter article title..."
+                value={articleTitle}
+                onChange={e => setArticleTitle(e.target.value)}
+                className="text-base border-border/50 bg-background"
+              />
+            </div>
+          </Card>
 
           {/* Article Body Section */}
           <Card className="border-border/50 bg-card p-6">

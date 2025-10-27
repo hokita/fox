@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Calendar, Link2, BookOpen, HelpCircle, Save, ArrowLeft } from 'lucide-react'
+import { Calendar, Link2, BookOpen, HelpCircle, Save, ArrowLeft, Download } from 'lucide-react'
 import Link from 'next/link'
-import { getArticleById, updateArticle } from '@/api/articles'
+import { getArticleById, updateArticle, scrapeArticle } from '@/api/articles'
 import { ArticleDetail } from '@/models/article'
 
 export default function ArticleEditPage({ params }: { params: Promise<{ id: string }> }) {
@@ -18,10 +18,12 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
   const [article, setArticle] = useState<ArticleDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [scraping, setScraping] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const [date, setDate] = useState('')
   const [articleUrl, setArticleUrl] = useState('')
+  const [articleTitle, setArticleTitle] = useState('')
   const [articleBody, setArticleBody] = useState('')
   const [questions, setQuestions] = useState<
     Array<{
@@ -44,6 +46,7 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
 
         setDate(formattedDate)
         setArticleUrl(data.url)
+        setArticleTitle(data.title)
         setArticleBody(data.body)
 
         // Convert questions to local format
@@ -64,6 +67,42 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
     fetchArticle()
   }, [id])
 
+  const handleScrape = async () => {
+    if (!articleUrl) {
+      setError('Please enter a URL to scrape')
+      return
+    }
+
+    if (!articleUrl.includes('eikaiwa.dmm.com/app/daily-news/article/')) {
+      setError('Please enter a valid DMM Eikaiwa Daily News article URL')
+      return
+    }
+
+    setError(null)
+    setScraping(true)
+
+    try {
+      const scrapedData = await scrapeArticle(articleUrl)
+
+      // Populate the form with scraped data
+      setArticleTitle(scrapedData.title)
+      setArticleBody(scrapedData.body)
+      setQuestions(
+        scrapedData.questions.map((q, index) => ({
+          id: index + 1,
+          question: q,
+          answer: questions[index]?.answer || '',
+        })),
+      )
+
+      alert('Article scraped successfully! Review the data and save when ready.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to scrape article')
+    } finally {
+      setScraping(false)
+    }
+  }
+
   const handleQuestionChange = (id: number, value: string) => {
     setQuestions(questions.map(q => (q.id === id ? { ...q, question: value } : q)))
   }
@@ -79,6 +118,7 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
     try {
       await updateArticle(id, {
         url: articleUrl,
+        title: articleTitle,
         body: articleBody,
         studied_at: date,
         questions: questions.map(q => ({
@@ -172,14 +212,29 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
                   <Link2 className="h-4 w-4 text-accent-foreground" />
                   Article URL
                 </Label>
-                <Input
-                  id="url"
-                  type="url"
-                  placeholder="https://example.com/article"
-                  value={articleUrl}
-                  onChange={e => setArticleUrl(e.target.value)}
-                  className="w-full border-border/50 bg-background"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="url"
+                    type="url"
+                    placeholder="https://eikaiwa.dmm.com/app/daily-news/article/..."
+                    value={articleUrl}
+                    onChange={e => setArticleUrl(e.target.value)}
+                    className="flex-1 border-border/50 bg-background"
+                  />
+                  <Button
+                    onClick={handleScrape}
+                    disabled={scraping || !articleUrl}
+                    variant="secondary"
+                    className="gap-2 whitespace-nowrap"
+                  >
+                    <Download className="h-4 w-4" />
+                    {scraping ? 'Scraping...' : 'Scrape'}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Enter a DMM Eikaiwa Daily News URL and click Scrape to auto-fill the article and
+                  questions
+                </p>
               </div>
             </div>
           </Card>
@@ -190,6 +245,27 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
               <p className="text-sm text-destructive">{error}</p>
             </Card>
           )}
+
+          {/* Article Title Section */}
+          <Card className="border-border/50 bg-card p-6">
+            <div className="space-y-3">
+              <Label
+                htmlFor="title"
+                className="flex items-center gap-2 text-base font-semibold text-foreground"
+              >
+                <BookOpen className="h-5 w-5 text-accent-foreground" />
+                Article Title
+              </Label>
+              <Input
+                id="title"
+                type="text"
+                placeholder="Enter article title..."
+                value={articleTitle}
+                onChange={e => setArticleTitle(e.target.value)}
+                className="text-base border-border/50 bg-background"
+              />
+            </div>
+          </Card>
 
           {/* Article Body Section */}
           <Card className="border-border/50 bg-card p-6">

@@ -40,6 +40,7 @@ export async function getArticleById(id: string): Promise<ArticleDetail> {
 
 export interface CreateArticleInput {
   url: string
+  title: string
   body: string
   studied_at: string
   questions: Array<{
@@ -71,6 +72,7 @@ export async function createArticle(input: CreateArticleInput): Promise<CreateAr
 
 export interface UpdateArticleInput {
   url: string
+  title: string
   body: string
   studied_at: string
   questions: Array<{
