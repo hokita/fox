@@ -2,7 +2,7 @@ import { Article, ArticleDetail } from '@/models/article'
 import { ArticlesResponse, ArticleResponse } from '@/models/response'
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
 // API Functions
 export async function getArticles(): Promise<Article[]> {
