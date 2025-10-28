@@ -34,8 +34,8 @@ const initializeSchema = (db: Database.Database): void => {
       title TEXT NOT NULL,
       body TEXT NOT NULL,
       studied_at TEXT NOT NULL,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS questions (
@@ -44,8 +44,8 @@ const initializeSchema = (db: Database.Database): void => {
       sort INTEGER NOT NULL,
       body TEXT NOT NULL,
       answer TEXT NOT NULL,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE
     );
   `)
@@ -117,34 +117,18 @@ export const createSQLiteArticleRepository = (
 
   const create = async (article: Article, questions: Question[]): Promise<void> => {
     const insertArticle = db.prepare(
-      'INSERT INTO articles (id, url, title, body, studied_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO articles (id, url, title, body, studied_at) VALUES (?, ?, ?, ?, ?)',
     )
 
     const insertQuestion = db.prepare(
-      'INSERT INTO questions (id, article_id, sort, body, answer, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO questions (id, article_id, sort, body, answer) VALUES (?, ?, ?, ?, ?)',
     )
 
     const transaction = db.transaction(() => {
-      insertArticle.run(
-        article.id,
-        article.url,
-        article.title,
-        article.body,
-        article.studied_at.toISOString(),
-        article.created_at.toISOString(),
-        article.updated_at.toISOString(),
-      )
+      insertArticle.run(article.id, article.url, article.title, article.body, article.studied_at.toISOString())
 
       questions.forEach(q => {
-        insertQuestion.run(
-          q.id,
-          q.article_id,
-          q.sort,
-          q.body,
-          q.answer,
-          q.created_at.toISOString(),
-          q.updated_at.toISOString(),
-        )
+        insertQuestion.run(q.id, q.article_id, q.sort, q.body, q.answer)
       })
     })
 
@@ -153,37 +137,22 @@ export const createSQLiteArticleRepository = (
 
   const update = async (id: string, article: Article, questions: Question[]): Promise<void> => {
     const updateArticle = db.prepare(
-      'UPDATE articles SET url = ?, title = ?, body = ?, studied_at = ?, updated_at = ? WHERE id = ?',
+      'UPDATE articles SET url = ?, title = ?, body = ?, studied_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
     )
 
     const deleteQuestions = db.prepare('DELETE FROM questions WHERE article_id = ?')
 
     const insertQuestion = db.prepare(
-      'INSERT INTO questions (id, article_id, sort, body, answer, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO questions (id, article_id, sort, body, answer) VALUES (?, ?, ?, ?, ?)',
     )
 
     const transaction = db.transaction(() => {
-      updateArticle.run(
-        article.url,
-        article.title,
-        article.body,
-        article.studied_at.toISOString(),
-        new Date().toISOString(),
-        id,
-      )
+      updateArticle.run(article.url, article.title, article.body, article.studied_at.toISOString(), id)
 
       deleteQuestions.run(id)
 
       questions.forEach(q => {
-        insertQuestion.run(
-          q.id,
-          q.article_id,
-          q.sort,
-          q.body,
-          q.answer,
-          q.created_at.toISOString(),
-          q.updated_at.toISOString(),
-        )
+        insertQuestion.run(q.id, q.article_id, q.sort, q.body, q.answer)
       })
     })
 

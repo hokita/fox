@@ -93,31 +93,15 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
 
       // Insert article
       await connection.query(
-        'INSERT INTO articles (id, url, title, body, studied_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [
-          article.id,
-          article.url,
-          article.title,
-          article.body,
-          article.studied_at,
-          article.created_at,
-          article.updated_at,
-        ],
+        'INSERT INTO articles (id, url, title, body, studied_at) VALUES (?, ?, ?, ?, ?)',
+        [article.id, article.url, article.title, article.body, article.studied_at],
       )
 
       // Insert questions
       for (const question of questions) {
         await connection.query(
-          'INSERT INTO questions (id, article_id, sort, body, answer, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [
-            question.id,
-            question.article_id,
-            question.sort,
-            question.body,
-            question.answer,
-            question.created_at,
-            question.updated_at,
-          ],
+          'INSERT INTO questions (id, article_id, sort, body, answer) VALUES (?, ?, ?, ?, ?)',
+          [question.id, question.article_id, question.sort, question.body, question.answer],
         )
       }
 
@@ -138,8 +122,8 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
 
       // Update article
       await connection.query(
-        'UPDATE articles SET url = ?, title = ?, body = ?, studied_at = ?, updated_at = ? WHERE id = ?',
-        [article.url, article.title, article.body, article.studied_at, new Date(), id],
+        'UPDATE articles SET url = ?, title = ?, body = ?, studied_at = ? WHERE id = ?',
+        [article.url, article.title, article.body, article.studied_at, id],
       )
 
       // Delete existing questions
@@ -148,16 +132,8 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
       // Insert new questions
       for (const question of questions) {
         await connection.query(
-          'INSERT INTO questions (id, article_id, sort, body, answer, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [
-            question.id,
-            question.article_id,
-            question.sort,
-            question.body,
-            question.answer,
-            question.created_at,
-            question.updated_at,
-          ],
+          'INSERT INTO questions (id, article_id, sort, body, answer) VALUES (?, ?, ?, ?, ?)',
+          [question.id, question.article_id, question.sort, question.body, question.answer],
         )
       }
 

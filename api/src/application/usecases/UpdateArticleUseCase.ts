@@ -24,8 +24,6 @@ export const createUpdateArticleUseCase = (articleRepository: ArticleRepository)
       body,
       title,
       studied_at,
-      created_at: existingArticle.created_at,
-      updated_at: new Date(),
     }
 
     // Convert question inputs to question entities
@@ -35,8 +33,6 @@ export const createUpdateArticleUseCase = (articleRepository: ArticleRepository)
       sort: index + 1,
       body: input.question,
       answer: input.answer,
-      created_at: new Date(),
-      updated_at: new Date(),
     }))
 
     await articleRepository.update(id, article, questions)

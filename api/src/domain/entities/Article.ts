@@ -4,8 +4,8 @@ export interface Article {
   body: string
   title: string
   studied_at: Date
-  created_at: Date
-  updated_at: Date
+  created_at?: Date
+  updated_at?: Date
 }
 
 export interface Question {
@@ -14,8 +14,8 @@ export interface Question {
   sort: number
   body: string
   answer: string
-  created_at: Date
-  updated_at: Date
+  created_at?: Date
+  updated_at?: Date
 }
 
 export interface ArticleDetail extends Article {
