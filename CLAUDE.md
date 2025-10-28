@@ -58,7 +58,7 @@ Presentation Layer (HTTP Interface)
 cd api
 
 # Development
-npm run dev              # Start dev server with hot reload (port 3000)
+npm run dev              # Start dev server with hot reload (port 3001)
 npm run build            # Compile TypeScript to dist/
 npm start               # Run production build
 
@@ -89,6 +89,15 @@ Tests use **SQLite in-memory database** instead of MySQL to avoid external depen
 - **Production**: MySQL (connection via `src/infrastructure/database/config.ts`)
 - **Testing**: SQLite in-memory (via better-sqlite3)
 - Environment variables in `.env` file (not in repo)
+- **Schema**: `spec/db/ddl.sql`
+
+### Article Title Management
+
+Articles have user-editable titles stored in the database:
+- Title is a required field in both CREATE and UPDATE endpoints
+- Stored in `articles.title` column (VARCHAR(255))
+- Frontend sends title in request body, backend persists it directly
+- No automatic title extraction from article body
 
 ## Frontend (fe/)
 
@@ -107,7 +116,7 @@ Tests use **SQLite in-memory database** instead of MySQL to avoid external depen
 cd fe
 
 # Development
-npm run dev              # Start dev server with Turbopack (port 3001)
+npm run dev              # Start dev server with Turbopack (port 3000)
 npm run build            # Build for production
 npm start               # Start production server
 
@@ -119,7 +128,11 @@ npm run format:check    # Check formatting
 
 ### API Integration
 
-The frontend communicates with the API at `http://localhost:3000` in development. API client code is in `api/` directory within the frontend.
+The frontend communicates with the API at `http://localhost:3001` in development. API client code is in `api/` directory within the frontend.
+
+### Favicon
+
+The app uses `app/icon.png` for the favicon. Next.js automatically converts this to various favicon formats.
 
 ## Common Workflows
 
@@ -151,6 +164,19 @@ cd fe && npm run dev
 - Jest globals are configured in ESLint for test files
 - Always run `npm run lint` and `npm run format:check` before committing
 - Integration tests must pass before committing
+
+## Deployment
+
+### Kubernetes Manifests
+
+Located in `manifests/`:
+- `namespace.yaml` - fox namespace
+- `api.yaml` - API deployment and service (NodePort 30007)
+- `fe.yaml` - Frontend deployment and service (NodePort 30008)
+
+Health check probes are configured with extended timeouts for slow startup:
+- Liveness probe: 120s initial delay, 10s timeout, 5 failure threshold
+- Readiness probe: 60s initial delay, 10s timeout, 5 failure threshold
 
 ## Git Workflow
 
