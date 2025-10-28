@@ -132,7 +132,7 @@ The frontend communicates with the API at `http://localhost:3001` in development
 
 ### Favicon
 
-The app uses `app/icon.png` for the favicon. Next.js automatically converts this to various favicon formats.
+The app uses `app/icon.png` for the favicon and `app/apple-icon.png` for the Apple touch icon. Next.js automatically generates the appropriate meta tags and converts these to various formats.
 
 ## Common Workflows
 
