@@ -30,6 +30,7 @@ describe('Articles API Integration Tests', () => {
     it('should create a new article with questions', async () => {
       const newArticle = {
         url: 'https://example.com/test-article',
+        title: 'Test Article Title',
         body: 'Test Article Body\n\nThis is a test article for integration testing.',
         studied_at: '2025-10-23',
         questions: [
@@ -72,6 +73,7 @@ describe('Articles API Integration Tests', () => {
         .post('/api/articles')
         .send({
           url: 'https://example.com/article-1',
+          title: 'First Article',
           body: 'First Article\n\nContent of first article',
           studied_at: '2025-10-23',
           questions: [{ question: 'Question 1?', answer: 'Answer 1' }],
@@ -81,6 +83,7 @@ describe('Articles API Integration Tests', () => {
         .post('/api/articles')
         .send({
           url: 'https://example.com/article-2',
+          title: 'Second Article',
           body: 'Second Article\n\nContent of second article',
           studied_at: '2025-10-22',
           questions: [{ question: 'Question 2?', answer: 'Answer 2' }],
@@ -126,6 +129,7 @@ describe('Articles API Integration Tests', () => {
         .post('/api/articles')
         .send({
           url: 'https://example.com/detailed-article',
+          title: 'Detailed Article',
           body: 'Detailed Article\n\nThis article has questions',
           studied_at: '2025-10-23',
           questions: [
@@ -176,6 +180,7 @@ describe('Articles API Integration Tests', () => {
         .post('/api/articles')
         .send({
           url: 'https://example.com/original-article',
+          title: 'Original Title',
           body: 'Original Body\n\nOriginal content',
           studied_at: '2025-10-23',
           questions: [{ question: 'Original question?', answer: 'Original answer' }],
@@ -186,6 +191,7 @@ describe('Articles API Integration Tests', () => {
     it('should update an existing article', async () => {
       const updatedData = {
         url: 'https://example.com/updated-article',
+        title: 'Updated Title',
         body: 'Updated Body\n\nUpdated content',
         studied_at: '2025-10-24',
         questions: [
@@ -213,6 +219,7 @@ describe('Articles API Integration Tests', () => {
     it('should return 404 when updating non-existent article', async () => {
       const updatedData = {
         url: 'https://example.com/updated',
+        title: 'Updated Title',
         body: 'Updated content',
         studied_at: '2025-10-24',
         questions: [],

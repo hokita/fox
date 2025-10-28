@@ -1,12 +1,12 @@
 import { Article, Question } from '../../domain/entities/Article'
 import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
-import { extractTitle } from '../../domain/services/TitleExtractor'
 import { randomUUID } from 'crypto'
 
 export const createUpdateArticleUseCase = (articleRepository: ArticleRepository) => {
   const execute = async (
     id: string,
     url: string,
+    title: string,
     body: string,
     studied_at: Date,
     questionInputs: Array<{ question: string; answer: string }>,
@@ -16,8 +16,6 @@ export const createUpdateArticleUseCase = (articleRepository: ArticleRepository)
     if (!existingArticle) {
       throw new Error('Article not found')
     }
-
-    const title = extractTitle(body)
 
     // Create updated domain entity
     const article: Article = {

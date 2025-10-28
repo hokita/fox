@@ -1,12 +1,12 @@
 import { Article, ArticleDetail, Question } from '../../domain/entities/Article'
 import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
-import { extractTitle } from '../../domain/services/TitleExtractor'
 import pool from '../database/config'
 import { RowDataPacket } from 'mysql2'
 
 interface ArticleRow extends RowDataPacket {
   id: string
   url: string
+  title: string
   body: string
   studied_at: string
   created_at: string
@@ -29,7 +29,7 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
 
     return rows.map(row => ({
       id: row.id,
-      title: extractTitle(row.body),
+      title: row.title,
       url: row.url,
       body: row.body,
       studied_at: new Date(row.studied_at),
@@ -48,7 +48,7 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
     const row = rows[0]
     return {
       id: row.id,
-      title: extractTitle(row.body),
+      title: row.title,
       url: row.url,
       body: row.body,
       studied_at: new Date(row.studied_at),
@@ -93,10 +93,11 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
 
       // Insert article
       await connection.query(
-        'INSERT INTO articles (id, url, body, studied_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO articles (id, url, title, body, studied_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [
           article.id,
           article.url,
+          article.title,
           article.body,
           article.studied_at,
           article.created_at,
@@ -137,8 +138,8 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
 
       // Update article
       await connection.query(
-        'UPDATE articles SET url = ?, body = ?, studied_at = ?, updated_at = ? WHERE id = ?',
-        [article.url, article.body, article.studied_at, new Date(), id],
+        'UPDATE articles SET url = ?, title = ?, body = ?, studied_at = ?, updated_at = ? WHERE id = ?',
+        [article.url, article.title, article.body, article.studied_at, new Date(), id],
       )
 
       // Delete existing questions

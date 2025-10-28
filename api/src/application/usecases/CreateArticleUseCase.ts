@@ -1,20 +1,17 @@
 import { Article, Question } from '../../domain/entities/Article'
 import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
-import { extractTitle } from '../../domain/services/TitleExtractor'
 import { randomUUID } from 'crypto'
 
 export const createCreateArticleUseCase = (articleRepository: ArticleRepository) => {
   const execute = async (
     url: string,
+    title: string,
     body: string,
     studied_at: Date,
     questionInputs: Array<{ question: string; answer: string }>,
   ): Promise<{ id: string; message: string }> => {
     // Generate UUID for article ID
     const id = randomUUID()
-
-    // Extract title from body
-    const title = extractTitle(body)
 
     // Create domain entity
     const article: Article = {

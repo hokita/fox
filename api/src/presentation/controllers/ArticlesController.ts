@@ -13,6 +13,7 @@ interface GetArticleUseCase {
 interface CreateArticleUseCase {
   execute: (
     url: string,
+    title: string,
     body: string,
     studied_at: Date,
     questions: Array<{ question: string; answer: string }>,
@@ -23,6 +24,7 @@ interface UpdateArticleUseCase {
   execute: (
     id: string,
     url: string,
+    title: string,
     body: string,
     studied_at: Date,
     questions: Array<{ question: string; answer: string }>,
@@ -70,9 +72,9 @@ export const createArticlesController = (useCases: UseCases) => {
 
   const createArticle = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { url, body, studied_at, questions } = req.body
+      const { url, title, body, studied_at, questions } = req.body
 
-      if (!url || !body || !studied_at || !questions) {
+      if (!url || !title || !body || !studied_at || !questions) {
         res.status(400).json({ error: 'Missing required fields' })
         return
       }
@@ -82,6 +84,7 @@ export const createArticlesController = (useCases: UseCases) => {
 
       const result = await useCases.createArticleUseCase.execute(
         url,
+        title,
         body,
         studiedAtDate,
         questions,
@@ -97,9 +100,9 @@ export const createArticlesController = (useCases: UseCases) => {
   const updateArticle = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params
-      const { url, body, studied_at, questions } = req.body
+      const { url, title, body, studied_at, questions } = req.body
 
-      if (!url || !body || !studied_at || !questions) {
+      if (!url || !title || !body || !studied_at || !questions) {
         res.status(400).json({ error: 'Missing required fields' })
         return
       }
@@ -110,6 +113,7 @@ export const createArticlesController = (useCases: UseCases) => {
       const result = await useCases.updateArticleUseCase.execute(
         id,
         url,
+        title,
         body,
         studiedAtDate,
         questions,

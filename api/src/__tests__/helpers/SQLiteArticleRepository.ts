@@ -5,11 +5,11 @@
 import Database from 'better-sqlite3'
 import { Article, ArticleDetail, Question } from '../../domain/entities/Article'
 import { ArticleRepository } from '../../domain/repositories/ArticleRepository'
-import { extractTitle } from '../../domain/services/TitleExtractor'
 
 interface ArticleRow {
   id: string
   url: string
+  title: string
   body: string
   studied_at: string
   created_at: string
@@ -31,6 +31,7 @@ const initializeSchema = (db: Database.Database): void => {
     CREATE TABLE IF NOT EXISTS articles (
       id TEXT PRIMARY KEY,
       url TEXT NOT NULL,
+      title TEXT NOT NULL,
       body TEXT NOT NULL,
       studied_at TEXT NOT NULL,
       created_at TEXT NOT NULL,
@@ -60,7 +61,7 @@ export const createSQLiteArticleRepository = (
 
     return rows.map(row => ({
       id: row.id,
-      title: extractTitle(row.body),
+      title: row.title,
       url: row.url,
       body: row.body,
       studied_at: new Date(row.studied_at),
@@ -78,7 +79,7 @@ export const createSQLiteArticleRepository = (
 
     return {
       id: row.id,
-      title: extractTitle(row.body),
+      title: row.title,
       url: row.url,
       body: row.body,
       studied_at: new Date(row.studied_at),
@@ -116,7 +117,7 @@ export const createSQLiteArticleRepository = (
 
   const create = async (article: Article, questions: Question[]): Promise<void> => {
     const insertArticle = db.prepare(
-      'INSERT INTO articles (id, url, body, studied_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+      'INSERT INTO articles (id, url, title, body, studied_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
     )
 
     const insertQuestion = db.prepare(
@@ -127,6 +128,7 @@ export const createSQLiteArticleRepository = (
       insertArticle.run(
         article.id,
         article.url,
+        article.title,
         article.body,
         article.studied_at.toISOString(),
         article.created_at.toISOString(),
@@ -151,7 +153,7 @@ export const createSQLiteArticleRepository = (
 
   const update = async (id: string, article: Article, questions: Question[]): Promise<void> => {
     const updateArticle = db.prepare(
-      'UPDATE articles SET url = ?, body = ?, studied_at = ?, updated_at = ? WHERE id = ?',
+      'UPDATE articles SET url = ?, title = ?, body = ?, studied_at = ?, updated_at = ? WHERE id = ?',
     )
 
     const deleteQuestions = db.prepare('DELETE FROM questions WHERE article_id = ?')
@@ -163,6 +165,7 @@ export const createSQLiteArticleRepository = (
     const transaction = db.transaction(() => {
       updateArticle.run(
         article.url,
+        article.title,
         article.body,
         article.studied_at.toISOString(),
         new Date().toISOString(),
