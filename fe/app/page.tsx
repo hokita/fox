@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getArticles } from '@/api/articles'
 import { formatDisplayDate } from '@/lib/date'
 import { type Article } from '@/models/article'
@@ -34,13 +35,16 @@ export default function ArticleListPage() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
         <div className="mb-16 flex items-start justify-between">
-          <div>
-            <h1 className="font-serif text-5xl font-light tracking-tight text-foreground lg:text-6xl">
-              English Learning
-            </h1>
-            <p className="mt-3 text-lg text-muted-foreground">
-              Read articles and practice comprehension
-            </p>
+          <div className="flex items-center gap-6">
+            <Image src="/fox-icon.png" alt="Fox" width={80} height={80} className="rounded-xl" />
+            <div>
+              <h1 className="font-serif text-5xl font-light tracking-tight text-foreground lg:text-6xl">
+                English Learning
+              </h1>
+              <p className="mt-3 text-lg text-muted-foreground">
+                Read articles and practice comprehension
+              </p>
+            </div>
           </div>
           <Button asChild size="lg" className="gap-2">
             <Link href="/articles/new">
