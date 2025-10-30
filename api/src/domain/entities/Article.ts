@@ -3,6 +3,7 @@ export interface Article {
   url: string
   body: string
   title: string
+  memo: string
   studied_at: Date
   created_at?: Date
   updated_at?: Date

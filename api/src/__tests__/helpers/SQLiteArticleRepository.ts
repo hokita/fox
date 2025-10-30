@@ -11,6 +11,7 @@ interface ArticleRow {
   url: string
   title: string
   body: string
+  memo: string
   studied_at: string
   created_at: string
   updated_at: string
@@ -33,6 +34,7 @@ const initializeSchema = (db: Database.Database): void => {
       url TEXT NOT NULL,
       title TEXT NOT NULL,
       body TEXT NOT NULL,
+      memo TEXT NOT NULL DEFAULT '',
       studied_at TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -64,6 +66,7 @@ export const createSQLiteArticleRepository = (
       title: row.title,
       url: row.url,
       body: row.body,
+      memo: row.memo,
       studied_at: new Date(row.studied_at),
       created_at: new Date(row.created_at),
       updated_at: new Date(row.updated_at),
@@ -82,6 +85,7 @@ export const createSQLiteArticleRepository = (
       title: row.title,
       url: row.url,
       body: row.body,
+      memo: row.memo,
       studied_at: new Date(row.studied_at),
       created_at: new Date(row.created_at),
       updated_at: new Date(row.updated_at),
@@ -117,7 +121,7 @@ export const createSQLiteArticleRepository = (
 
   const create = async (article: Article, questions: Question[]): Promise<void> => {
     const insertArticle = db.prepare(
-      'INSERT INTO articles (id, url, title, body, studied_at) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO articles (id, url, title, body, memo, studied_at) VALUES (?, ?, ?, ?, ?, ?)',
     )
 
     const insertQuestion = db.prepare(
@@ -125,7 +129,7 @@ export const createSQLiteArticleRepository = (
     )
 
     const transaction = db.transaction(() => {
-      insertArticle.run(article.id, article.url, article.title, article.body, article.studied_at.toISOString())
+      insertArticle.run(article.id, article.url, article.title, article.body, article.memo, article.studied_at.toISOString())
 
       questions.forEach(q => {
         insertQuestion.run(q.id, q.article_id, q.sort, q.body, q.answer)
@@ -137,7 +141,7 @@ export const createSQLiteArticleRepository = (
 
   const update = async (id: string, article: Article, questions: Question[]): Promise<void> => {
     const updateArticle = db.prepare(
-      'UPDATE articles SET url = ?, title = ?, body = ?, studied_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      'UPDATE articles SET url = ?, title = ?, body = ?, memo = ?, studied_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
     )
 
     const deleteQuestions = db.prepare('DELETE FROM questions WHERE article_id = ?')
@@ -147,7 +151,7 @@ export const createSQLiteArticleRepository = (
     )
 
     const transaction = db.transaction(() => {
-      updateArticle.run(article.url, article.title, article.body, article.studied_at.toISOString(), id)
+      updateArticle.run(article.url, article.title, article.body, article.memo, article.studied_at.toISOString(), id)
 
       deleteQuestions.run(id)
 

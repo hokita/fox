@@ -42,6 +42,7 @@ export interface CreateArticleInput {
   url: string
   title: string
   body: string
+  memo: string
   studied_at: string
   questions: Array<{
     question: string
@@ -74,6 +75,7 @@ export interface UpdateArticleInput {
   url: string
   title: string
   body: string
+  memo: string
   studied_at: string
   questions: Array<{
     question: string

@@ -32,6 +32,7 @@ describe('Articles API Integration Tests', () => {
         url: 'https://example.com/test-article',
         title: 'Test Article Title',
         body: 'Test Article Body\n\nThis is a test article for integration testing.',
+        memo: '',
         studied_at: '2025-10-23',
         questions: [
           {
@@ -75,6 +76,7 @@ describe('Articles API Integration Tests', () => {
           url: 'https://example.com/article-1',
           title: 'First Article',
           body: 'First Article\n\nContent of first article',
+          memo: '',
           studied_at: '2025-10-23',
           questions: [{ question: 'Question 1?', answer: 'Answer 1' }],
         })
@@ -85,6 +87,7 @@ describe('Articles API Integration Tests', () => {
           url: 'https://example.com/article-2',
           title: 'Second Article',
           body: 'Second Article\n\nContent of second article',
+          memo: '',
           studied_at: '2025-10-22',
           questions: [{ question: 'Question 2?', answer: 'Answer 2' }],
         })
@@ -104,6 +107,7 @@ describe('Articles API Integration Tests', () => {
       expect(article).toHaveProperty('title')
       expect(article).toHaveProperty('url')
       expect(article).toHaveProperty('body')
+      expect(article).toHaveProperty('memo')
       expect(article).toHaveProperty('studied_at')
       expect(article).toHaveProperty('created_at')
       expect(article).toHaveProperty('updated_at')
@@ -131,6 +135,7 @@ describe('Articles API Integration Tests', () => {
           url: 'https://example.com/detailed-article',
           title: 'Detailed Article',
           body: 'Detailed Article\n\nThis article has questions',
+          memo: '',
           studied_at: '2025-10-23',
           questions: [
             { question: 'First question?', answer: 'First answer' },
@@ -182,6 +187,7 @@ describe('Articles API Integration Tests', () => {
           url: 'https://example.com/original-article',
           title: 'Original Title',
           body: 'Original Body\n\nOriginal content',
+          memo: '',
           studied_at: '2025-10-23',
           questions: [{ question: 'Original question?', answer: 'Original answer' }],
         })
@@ -193,6 +199,7 @@ describe('Articles API Integration Tests', () => {
         url: 'https://example.com/updated-article',
         title: 'Updated Title',
         body: 'Updated Body\n\nUpdated content',
+        memo: 'Updated memo',
         studied_at: '2025-10-24',
         questions: [
           { question: 'Updated question 1?', answer: 'Updated answer 1' },
@@ -221,6 +228,7 @@ describe('Articles API Integration Tests', () => {
         url: 'https://example.com/updated',
         title: 'Updated Title',
         body: 'Updated content',
+        memo: '',
         studied_at: '2025-10-24',
         questions: [],
       }

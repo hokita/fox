@@ -131,6 +131,21 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
             </div>
           </Card>
 
+          {/* Memo Section */}
+          {article.memo && article.memo.trim() !== '' && (
+            <Card className="border-border/50 bg-card p-6">
+              <div className="space-y-3">
+                <Label className="flex items-center gap-2 text-base font-semibold text-foreground">
+                  <BookOpen className="h-5 w-5 text-accent-foreground" />
+                  Memo
+                </Label>
+                <div className="text-base leading-relaxed text-foreground whitespace-pre-wrap bg-accent/10 p-4 rounded-md border border-border/30">
+                  {article.memo}
+                </div>
+              </div>
+            </Card>
+          )}
+
           {/* Article Body Section */}
           <Card className="border-border/50 bg-card p-6">
             <div className="space-y-3">

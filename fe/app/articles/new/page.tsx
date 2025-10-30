@@ -26,6 +26,7 @@ export default function EnglishLearningPage() {
   const [articleUrl, setArticleUrl] = useState('')
   const [articleTitle, setArticleTitle] = useState('')
   const [articleBody, setArticleBody] = useState('')
+  const [memo, setMemo] = useState('')
   const [questions, setQuestions] = useState([
     { id: 1, question: '', answer: '' },
     { id: 2, question: '', answer: '' },
@@ -90,6 +91,7 @@ export default function EnglishLearningPage() {
         url: articleUrl,
         title: articleTitle,
         body: articleBody,
+        memo: memo,
         studied_at: date,
         questions: questions.map(q => ({
           question: q.question,
@@ -244,6 +246,29 @@ export default function EnglishLearningPage() {
                 onChange={e => setArticleBody(e.target.value)}
                 className="min-h-[300px] resize-y text-base leading-relaxed border-border/50 bg-background"
               />
+            </div>
+          </Card>
+
+          {/* Memo Section */}
+          <Card className="border-border/50 bg-card p-6">
+            <div className="space-y-3">
+              <Label
+                htmlFor="memo"
+                className="flex items-center gap-2 text-base font-semibold text-foreground"
+              >
+                <BookOpen className="h-5 w-5 text-accent-foreground" />
+                Memo
+              </Label>
+              <Textarea
+                id="memo"
+                placeholder="Add your personal notes or observations about this article..."
+                value={memo}
+                onChange={e => setMemo(e.target.value)}
+                className="min-h-[150px] resize-y text-base leading-relaxed border-border/50 bg-background"
+              />
+              <p className="text-xs text-muted-foreground">
+                Optional: Add your thoughts, key takeaways, or any notes about the article
+              </p>
             </div>
           </Card>
 

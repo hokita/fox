@@ -8,6 +8,7 @@ interface ArticleRow extends RowDataPacket {
   url: string
   title: string
   body: string
+  memo: string
   studied_at: string
   created_at: string
   updated_at: string
@@ -32,6 +33,7 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
       title: row.title,
       url: row.url,
       body: row.body,
+      memo: row.memo,
       studied_at: new Date(row.studied_at),
       created_at: new Date(row.created_at),
       updated_at: new Date(row.updated_at),
@@ -51,6 +53,7 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
       title: row.title,
       url: row.url,
       body: row.body,
+      memo: row.memo,
       studied_at: new Date(row.studied_at),
       created_at: new Date(row.created_at),
       updated_at: new Date(row.updated_at),
@@ -93,8 +96,8 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
 
       // Insert article
       await connection.query(
-        'INSERT INTO articles (id, url, title, body, studied_at) VALUES (?, ?, ?, ?, ?)',
-        [article.id, article.url, article.title, article.body, article.studied_at],
+        'INSERT INTO articles (id, url, title, body, memo, studied_at) VALUES (?, ?, ?, ?, ?, ?)',
+        [article.id, article.url, article.title, article.body, article.memo, article.studied_at],
       )
 
       // Insert questions
@@ -122,8 +125,8 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
 
       // Update article
       await connection.query(
-        'UPDATE articles SET url = ?, title = ?, body = ?, studied_at = ? WHERE id = ?',
-        [article.url, article.title, article.body, article.studied_at, id],
+        'UPDATE articles SET url = ?, title = ?, body = ?, memo = ?, studied_at = ? WHERE id = ?',
+        [article.url, article.title, article.body, article.memo, article.studied_at, id],
       )
 
       // Delete existing questions

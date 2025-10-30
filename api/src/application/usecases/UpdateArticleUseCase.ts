@@ -8,6 +8,7 @@ export const createUpdateArticleUseCase = (articleRepository: ArticleRepository)
     url: string,
     title: string,
     body: string,
+    memo: string,
     studied_at: Date,
     questionInputs: Array<{ question: string; answer: string }>,
   ): Promise<{ message: string }> => {
@@ -23,6 +24,7 @@ export const createUpdateArticleUseCase = (articleRepository: ArticleRepository)
       url,
       body,
       title,
+      memo,
       studied_at,
     }
 

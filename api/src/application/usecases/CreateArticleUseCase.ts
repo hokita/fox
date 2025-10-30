@@ -7,6 +7,7 @@ export const createCreateArticleUseCase = (articleRepository: ArticleRepository)
     url: string,
     title: string,
     body: string,
+    memo: string,
     studied_at: Date,
     questionInputs: Array<{ question: string; answer: string }>,
   ): Promise<{ id: string; message: string }> => {
@@ -19,6 +20,7 @@ export const createCreateArticleUseCase = (articleRepository: ArticleRepository)
       url,
       body,
       title,
+      memo,
       studied_at,
     }
 
