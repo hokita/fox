@@ -129,7 +129,14 @@ export const createSQLiteArticleRepository = (
     )
 
     const transaction = db.transaction(() => {
-      insertArticle.run(article.id, article.url, article.title, article.body, article.memo, article.studied_at.toISOString())
+      insertArticle.run(
+        article.id,
+        article.url,
+        article.title,
+        article.body,
+        article.memo,
+        article.studied_at.toISOString(),
+      )
 
       questions.forEach(q => {
         insertQuestion.run(q.id, q.article_id, q.sort, q.body, q.answer)
@@ -151,7 +158,14 @@ export const createSQLiteArticleRepository = (
     )
 
     const transaction = db.transaction(() => {
-      updateArticle.run(article.url, article.title, article.body, article.memo, article.studied_at.toISOString(), id)
+      updateArticle.run(
+        article.url,
+        article.title,
+        article.body,
+        article.memo,
+        article.studied_at.toISOString(),
+        id,
+      )
 
       deleteQuestions.run(id)
 
