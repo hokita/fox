@@ -184,7 +184,7 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
                         <Label className="text-sm font-medium text-muted-foreground">
                           Your Answer
                         </Label>
-                        <p className="text-base text-foreground">{q.answer}</p>
+                        <p className="text-base text-foreground whitespace-pre-wrap">{q.answer}</p>
                       </div>
                     </div>
                   ))}
