@@ -75,16 +75,15 @@ export const createDMMEikaiwaScraper = (): ArticleScraper => {
     if (exercise3.length > 0) {
       const text = exercise3.text()
 
-      // Extract English questions using regex pattern
-      // Matches: number + period + question starting with common question words + ending with ?
-      const questionPattern =
-        /(\d+)\.(What|Have|Do|Are|How|Why|When|Where|Who|Would|Could|Should|Can|Will|Is|Does)[^?]+\?/g
+      // Extract all numbered questions (all sentences in Discussion section are questions)
+      // Matches: number + period + optional whitespace + any text ending with ?
+      const questionPattern = /\d+\.\s*([^?]+\?)/g
       let match
 
       while ((match = questionPattern.exec(text)) !== null) {
-        // Remove the number prefix and trim
-        const question = match[0].replace(/^\d+\./, '').trim()
-        if (question.length > 10) {
+        const question = match[1].trim()
+        // Filter out instructions and keep only actual questions
+        if (question.length > 15 && !question.includes('based on the following')) {
           questions.push(question)
         }
       }
