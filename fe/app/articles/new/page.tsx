@@ -58,13 +58,14 @@ export default function EnglishLearningPage() {
       // Populate the form with scraped data
       setArticleTitle(scrapedData.title)
       setArticleBody(scrapedData.body)
-      setQuestions(
-        scrapedData.questions.map((q, index) => ({
-          id: index + 1,
-          question: q,
-          answer: '',
-        })),
-      )
+
+      // Always ensure we have exactly 5 question slots
+      const newQuestions = Array.from({ length: 5 }, (_, index) => ({
+        id: index + 1,
+        question: scrapedData.questions[index] || '',
+        answer: '',
+      }))
+      setQuestions(newQuestions)
 
       // Successfully scraped - no alert needed, form is auto-populated
     } catch (err) {

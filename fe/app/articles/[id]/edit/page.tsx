@@ -60,14 +60,13 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
         setArticleBody(data.body)
         setMemo(data.memo)
 
-        // Convert questions to local format
-        setQuestions(
-          data.questions.map((q, index) => ({
-            id: index + 1,
-            question: q.body,
-            answer: q.answer,
-          })),
-        )
+        // Convert questions to local format, always ensuring 5 question slots
+        const loadedQuestions = Array.from({ length: 5 }, (_, index) => ({
+          id: index + 1,
+          question: data.questions[index]?.body || '',
+          answer: data.questions[index]?.answer || '',
+        }))
+        setQuestions(loadedQuestions)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch article')
       } finally {
@@ -98,13 +97,14 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
       // Populate the form with scraped data
       setArticleTitle(scrapedData.title)
       setArticleBody(scrapedData.body)
-      setQuestions(
-        scrapedData.questions.map((q, index) => ({
-          id: index + 1,
-          question: q,
-          answer: questions[index]?.answer || '',
-        })),
-      )
+
+      // Always ensure we have exactly 5 question slots
+      const newQuestions = Array.from({ length: 5 }, (_, index) => ({
+        id: index + 1,
+        question: scrapedData.questions[index] || '',
+        answer: questions[index]?.answer || '',
+      }))
+      setQuestions(newQuestions)
 
       // Successfully scraped - no alert needed, form is auto-populated
     } catch (err) {
