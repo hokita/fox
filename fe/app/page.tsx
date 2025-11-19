@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Plus, ArrowRight } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getArticles } from '@/api/articles'
@@ -86,9 +86,9 @@ export default function ArticleListPage() {
                   <Link
                     key={article.id}
                     href={`/articles/${article.id}`}
-                    className="group block border-t border-border py-8 transition-colors hover:bg-accent/30"
+                    className="group block border-t border-border py-4 transition-colors hover:bg-accent/30"
                   >
-                    <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-12">
+                    <div className="grid grid-cols-1 items-start gap-2 lg:grid-cols-12">
                       {/* Date */}
                       <div className="lg:col-span-2">
                         <p className="font-mono text-sm uppercase tracking-wider text-muted-foreground">
@@ -96,16 +96,16 @@ export default function ArticleListPage() {
                         </p>
                       </div>
 
-                      {/* Title */}
-                      <div className="lg:col-span-9">
+                      {/* Title and Memo */}
+                      <div className="lg:col-span-10 space-y-2">
                         <h2 className="font-serif text-2xl font-light tracking-tight text-foreground transition-colors group-hover:text-primary lg:text-3xl">
                           {article.title}
                         </h2>
-                      </div>
-
-                      {/* Arrow */}
-                      <div className="flex justify-end lg:col-span-1">
-                        <ArrowRight className="h-6 w-6 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
+                        {article.memo && article.memo.trim() !== '' && (
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap border border-border rounded-md p-3">
+                            {article.memo}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </Link>
