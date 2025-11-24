@@ -1,7 +1,6 @@
 'use client'
 
 import { use, useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -16,6 +15,7 @@ import {
   ArrowLeft,
   Download,
   Loader2,
+  CheckCircle2,
 } from 'lucide-react'
 import Link from 'next/link'
 import { getArticleById, updateArticle, scrapeArticle } from '@/api/articles'
@@ -23,12 +23,12 @@ import { ArticleDetail } from '@/models/article'
 
 export default function ArticleEditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const router = useRouter()
   const [article, setArticle] = useState<ArticleDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [scraping, setScraping] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const [date, setDate] = useState('')
   const [articleUrl, setArticleUrl] = useState('')
@@ -124,6 +124,7 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
 
   const handleSave = async () => {
     setError(null)
+    setSuccessMessage(null)
     setSaving(true)
 
     try {
@@ -139,8 +140,13 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
         })),
       })
 
-      // Navigate back to the article
-      router.push(`/articles/${id}`)
+      // Show success message
+      setSuccessMessage('Article saved successfully!')
+
+      // Auto-hide success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 3000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update article')
     } finally {
@@ -386,21 +392,35 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
           </Card>
-
-          {/* Save Button */}
-          <div className="flex justify-end">
-            <Button
-              onClick={handleSave}
-              size="lg"
-              disabled={saving}
-              className="gap-2 px-8 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-            >
-              <Save className="h-5 w-5" />
-              {saving ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </div>
         </div>
       </div>
+
+      {/* Fixed Save Button */}
+      <div className="fixed bottom-8 right-8 z-40">
+        <Button
+          onClick={handleSave}
+          size="lg"
+          disabled={saving}
+          className="gap-2 px-8 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 shadow-lg"
+        >
+          <Save className="h-5 w-5" />
+          {saving ? 'Saving...' : 'Save Changes'}
+        </Button>
+      </div>
+
+      {/* Fixed Success Message */}
+      {successMessage && (
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
+          <Card className="border-green-500 bg-green-50 dark:bg-green-950/20 p-4 shadow-lg">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <p className="text-sm text-green-700 dark:text-green-300 font-medium">
+                {successMessage}
+              </p>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
