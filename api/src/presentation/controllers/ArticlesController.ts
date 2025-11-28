@@ -33,6 +33,10 @@ interface UpdateArticleUseCase {
   ) => Promise<{ message: string }>
 }
 
+interface DeleteArticleUseCase {
+  execute: (id: string) => Promise<{ message: string }>
+}
+
 interface ScrapeArticleUseCase {
   execute: (url: string) => Promise<ScrapedArticleData>
 }
@@ -42,6 +46,7 @@ interface UseCases {
   getArticleUseCase: GetArticleUseCase
   createArticleUseCase: CreateArticleUseCase
   updateArticleUseCase: UpdateArticleUseCase
+  deleteArticleUseCase: DeleteArticleUseCase
   scrapeArticleUseCase?: ScrapeArticleUseCase
 }
 
@@ -134,6 +139,23 @@ export const createArticlesController = (useCases: UseCases) => {
     }
   }
 
+  const deleteArticle = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params
+
+      const result = await useCases.deleteArticleUseCase.execute(id)
+
+      res.json(result)
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Article not found') {
+        res.status(404).json({ error: 'Article not found' })
+        return
+      }
+      console.error('Error deleting article:', error)
+      res.status(500).json({ error: 'Internal server error' })
+    }
+  }
+
   const scrapeArticle = async (req: Request, res: Response): Promise<void> => {
     try {
       if (!useCases.scrapeArticleUseCase) {
@@ -172,6 +194,7 @@ export const createArticlesController = (useCases: UseCases) => {
     getArticleById,
     createArticle,
     updateArticle,
+    deleteArticle,
     scrapeArticle,
   }
 }

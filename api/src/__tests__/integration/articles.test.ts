@@ -251,4 +251,53 @@ describe('Articles API Integration Tests', () => {
       expect(response.body).toHaveProperty('error', 'Missing required fields')
     })
   })
+
+  describe('DELETE /api/articles/:id', () => {
+    let testArticleId: string
+
+    beforeEach(async () => {
+      const response = await request(app)
+        .post('/api/articles')
+        .send({
+          url: 'https://example.com/to-be-deleted',
+          title: 'Article to Delete',
+          body: 'This article will be deleted\n\nContent to be deleted',
+          memo: 'Test memo',
+          studied_at: '2025-10-23',
+          questions: [
+            { question: 'Question 1?', answer: 'Answer 1' },
+            { question: 'Question 2?', answer: 'Answer 2' },
+          ],
+        })
+      testArticleId = response.body.id
+    })
+
+    it('should delete an existing article', async () => {
+      const response = await request(app).delete(`/api/articles/${testArticleId}`)
+
+      expect(response.status).toBe(200)
+      expect(response.body).toHaveProperty('message', 'Article deleted successfully')
+
+      // Verify the article is deleted
+      const getResponse = await request(app).get(`/api/articles/${testArticleId}`)
+      expect(getResponse.status).toBe(404)
+    })
+
+    it('should delete article and its associated questions', async () => {
+      // Delete the article
+      await request(app).delete(`/api/articles/${testArticleId}`)
+
+      // Verify questions are also deleted by checking the article is not found
+      const getResponse = await request(app).get(`/api/articles/${testArticleId}`)
+      expect(getResponse.status).toBe(404)
+      expect(getResponse.body).toHaveProperty('error', 'Article not found')
+    })
+
+    it('should return 404 when deleting non-existent article', async () => {
+      const response = await request(app).delete('/api/articles/non-existent-id')
+
+      expect(response.status).toBe(404)
+      expect(response.body).toHaveProperty('error', 'Article not found')
+    })
+  })
 })

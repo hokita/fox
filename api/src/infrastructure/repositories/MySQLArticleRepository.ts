@@ -149,11 +149,33 @@ export const createMySQLArticleRepository = (): ArticleRepository => {
     }
   }
 
+  const deleteArticle = async (id: string): Promise<void> => {
+    const connection = await pool.getConnection()
+
+    try {
+      await connection.beginTransaction()
+
+      // Delete questions first (foreign key constraint)
+      await connection.query('DELETE FROM questions WHERE article_id = ?', [id])
+
+      // Delete article
+      await connection.query('DELETE FROM articles WHERE id = ?', [id])
+
+      await connection.commit()
+    } catch (error) {
+      await connection.rollback()
+      throw error
+    } finally {
+      connection.release()
+    }
+  }
+
   return {
     findAll,
     findById,
     findByIdWithQuestions,
     create,
     update,
+    delete: deleteArticle,
   }
 }

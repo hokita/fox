@@ -4,16 +4,19 @@ import { use, useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Calendar, Link2, BookOpen, HelpCircle, Edit, ArrowLeft } from 'lucide-react'
+import { Calendar, Link2, BookOpen, HelpCircle, Edit, ArrowLeft, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { getArticleById } from '@/api/articles'
+import { useRouter } from 'next/navigation'
+import { getArticleById, deleteArticle } from '@/api/articles'
 import { ArticleDetail } from '@/models/article'
 import { formatDisplayDate } from '@/lib/date'
 
 export default function ArticlePreviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
+  const router = useRouter()
   const [article, setArticle] = useState<ArticleDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -31,6 +34,21 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
 
     fetchArticle()
   }, [id])
+
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this article? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      setDeleting(true)
+      await deleteArticle(id)
+      router.push('/')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete article')
+      setDeleting(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -79,12 +97,25 @@ export default function ArticlePreviewPage({ params }: { params: Promise<{ id: s
                 Back to Articles
               </Link>
             </Button>
-            <Button asChild size="lg" className="gap-2">
-              <Link href={`/articles/${id}/edit`}>
-                <Edit className="h-5 w-5" />
-                Edit
-              </Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                variant="outline"
+                size="lg"
+                className="gap-2 cursor-pointer"
+              >
+                <Trash2 className="h-5 w-5" />
+                {deleting ? 'Deleting...' : 'Delete'}
+              </Button>
+              <Button asChild size="lg" className="gap-2">
+                <Link href={`/articles/${id}/edit`}>
+                  <Edit className="h-5 w-5" />
+                  Edit
+                </Link>
+              </Button>
+            </div>
           </div>
           <h1 className="font-serif text-4xl font-light tracking-tight text-foreground">
             Article Preview

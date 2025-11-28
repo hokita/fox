@@ -106,6 +106,25 @@ export async function updateArticle(
   return await response.json()
 }
 
+export interface DeleteArticleResponse {
+  message: string
+}
+
+export async function deleteArticle(id: string): Promise<DeleteArticleResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/articles/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete article: ${response.status}`)
+  }
+
+  return await response.json()
+}
+
 export interface ScrapedArticleData {
   url: string
   title: string

@@ -177,6 +177,18 @@ export const createSQLiteArticleRepository = (
     transaction()
   }
 
+  const deleteArticle = async (id: string): Promise<void> => {
+    const deleteQuestions = db.prepare('DELETE FROM questions WHERE article_id = ?')
+    const deleteArticleStmt = db.prepare('DELETE FROM articles WHERE id = ?')
+
+    const transaction = db.transaction(() => {
+      deleteQuestions.run(id)
+      deleteArticleStmt.run(id)
+    })
+
+    transaction()
+  }
+
   // Test utility method to clear all data
   const clearAll = (): void => {
     db.exec('DELETE FROM questions')
@@ -189,6 +201,7 @@ export const createSQLiteArticleRepository = (
     findByIdWithQuestions,
     create,
     update,
+    delete: deleteArticle,
     clearAll,
   }
 }

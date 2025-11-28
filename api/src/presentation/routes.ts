@@ -4,6 +4,7 @@ import { createGetArticlesUseCase } from '../application/usecases/GetArticlesUse
 import { createGetArticleUseCase } from '../application/usecases/GetArticleUseCase'
 import { createCreateArticleUseCase } from '../application/usecases/CreateArticleUseCase'
 import { createUpdateArticleUseCase } from '../application/usecases/UpdateArticleUseCase'
+import { createDeleteArticleUseCase } from '../application/usecases/DeleteArticleUseCase'
 import { createScrapeArticleUseCase } from '../application/usecases/ScrapeArticleUseCase'
 import { createMySQLArticleRepository } from '../infrastructure/repositories/MySQLArticleRepository'
 import { createDMMEikaiwaScraper } from '../infrastructure/services/DMMEikaiwaScraper'
@@ -21,6 +22,7 @@ const getArticlesUseCase = createGetArticlesUseCase(articleRepository)
 const getArticleUseCase = createGetArticleUseCase(articleRepository)
 const createArticleUseCase = createCreateArticleUseCase(articleRepository)
 const updateArticleUseCase = createUpdateArticleUseCase(articleRepository)
+const deleteArticleUseCase = createDeleteArticleUseCase(articleRepository)
 
 // Scraper (optional, only initialized when needed)
 const scraper = createDMMEikaiwaScraper()
@@ -31,6 +33,7 @@ const articlesController = createArticlesController({
   getArticleUseCase,
   createArticleUseCase,
   updateArticleUseCase,
+  deleteArticleUseCase,
   scrapeArticleUseCase,
 })
 
@@ -39,5 +42,6 @@ router.post('/articles', (req, res) => articlesController.createArticle(req, res
 router.post('/articles/scrape', (req, res) => articlesController.scrapeArticle(req, res))
 router.get('/articles/:id', (req, res) => articlesController.getArticleById(req, res))
 router.put('/articles/:id', (req, res) => articlesController.updateArticle(req, res))
+router.delete('/articles/:id', (req, res) => articlesController.deleteArticle(req, res))
 
 export default router
